@@ -75,7 +75,7 @@ int sched_yield() {
 }
 
 int _system(char * s){
-    int pid = vfork();
+    int pid = fork();
     if(pid == 0) {
         execl("/bin/sh", "-c", s, (char *)0);
         exit(100);

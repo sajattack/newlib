@@ -18,55 +18,24 @@ extern "C" {
    sizes of any of the basic types change (short, int, long) [via a compile
    time option].  */
 
-#ifdef __CYGWIN__
-#include <cygwin/stat.h>
-#ifdef _COMPILING_NEWLIB
-#define stat64 stat
-#endif
-#else
 struct	stat
 {
-  dev_t		st_dev;
-  ino_t		st_ino;
-  mode_t	st_mode;
-  nlink_t	st_nlink;
-  uid_t		st_uid;
-  gid_t		st_gid;
-  dev_t		st_rdev;
-  off_t		st_size;
-#if defined(__rtems__)
-  struct timespec st_atim;
-  struct timespec st_mtim;
-  struct timespec st_ctim;
-  blksize_t     st_blksize;
-  blkcnt_t	st_blocks;
-#else
-  /* SysV/sco doesn't have the rest... But Solaris, eabi does.  */
-#if defined(__svr4__) && !defined(__PPC__) && !defined(__sun__)
-  time_t	st_atime;
-  time_t	st_mtime;
-  time_t	st_ctime;
-#else
-  time_t	st_atime;
-  long		st_spare1;
-  time_t	st_mtime;
-  long		st_spare2;
-  time_t	st_ctime;
-  long		st_spare3;
-  long		st_blksize;
-  long		st_blocks;
-  long	st_spare4[2];
-#endif
-#endif
+  int64_t   st_dev;
+  int64_t   st_ino;
+  int16_t	st_mode;
+  int32_t   st_nlink;
+  int32_t	st_uid;
+  int32_t	st_gid;
+  int64_t	st_size;
+  int32_t   st_blksize;
+  int64_t   st_blocks;
+  int64_t   st_mtime;
+  int32_t   st_mtime_nsec;
+  int64_t   st_atime;
+  int32_t   st_atime_nsec;
+  int64_t   st_ctime;
+  int32_t   st_ctime_nsec;
 };
-
-#if defined(__rtems__)
-#define st_atime st_atim.tv_sec
-#define st_ctime st_ctim.tv_sec
-#define st_mtime st_mtim.tv_sec
-#endif
-
-#endif
 
 #define	_IFMT		0170000	/* type of file */
 #define		_IFDIR	0040000	/* directory */
