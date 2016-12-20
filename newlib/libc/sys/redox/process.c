@@ -61,6 +61,10 @@ uid_t getuid() {
     return syscall0(SYS_GETUID);
 }
 
+int kill(int pid, int sig) {
+    return syscall2(SYS_KILL, pid, sig);
+}
+
 void * sbrk(ptrdiff_t increment){
     char * curr_brk = (char *)syscall1(SYS_BRK, 0);
     char * new_brk = (char *)syscall1(SYS_BRK, (uint64_t)(curr_brk + increment));
@@ -91,12 +95,12 @@ int _system(char * s){
     }
 }
 
-int setgid(gid_t gid) {
-    return syscall1(SYS_SETGID, gid);
+int setregid(gid_t rgid, gid_t egid) {
+    return syscall2(SYS_SETREGID, rgid, egid);
 }
 
-int setuid(uid_t uid) {
-    return syscall1(SYS_SETUID, uid);
+int setreuid(uid_t ruid, gid_t euid) {
+    return syscall2(SYS_SETREUID, ruid, euid);
 }
 
 pid_t wait(int * status) {

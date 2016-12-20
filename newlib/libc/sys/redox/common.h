@@ -63,8 +63,8 @@ extern int errno;
 #define SYS_PHYSUNMAP   948
 #define SYS_VIRTTOPHYS  949
 #define SYS_PIPE2       331
-#define SYS_SETGID      214
-#define SYS_SETUID      213
+#define SYS_SETREGID    204
+#define SYS_SETREUID    203
 #define SYS_WAITPID     7
 #define SYS_YIELD       158
 
