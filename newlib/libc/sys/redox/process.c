@@ -66,18 +66,18 @@ int kill(int pid, int sig) {
 }
 
 void * __brk(void * addr) {
-    (void *)syscall1(SYS_BRK, (uint64_t)addr);
+    return (void *)syscall1(SYS_BRK, (uint64_t)addr);
 }
 
 static char *curr_brk = NULL;
 
 int brk(void *end_data_segment) {
-     char *new_brk;
+    char *new_brk;
 
-     new_brk = __brk(end_data_segment);
-     if (new_brk != end_data_segment) return -1;
-     curr_brk = new_brk;
-     return 0;
+    new_brk = __brk(end_data_segment);
+    if (new_brk != end_data_segment) return -1;
+    curr_brk = new_brk;
+    return 0;
 }
 
 void * sbrk(ptrdiff_t increment) {
