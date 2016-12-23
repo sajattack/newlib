@@ -12,6 +12,10 @@
 #undef errno
 extern int errno;
 
+#define O_CLOEXEC       0x01000000
+#define O_DIRECTORY     0x10000000
+#define O_STAT          0x20000000
+
 #define SYS_CLASS       0xF0000000
 #define SYS_CLASS_PATH  0x10000000
 #define SYS_CLASS_FILE  0x20000000
@@ -26,7 +30,7 @@ extern int errno;
 
 #define SYS_LINK        SYS_CLASS_PATH | SYS_ARG_PATH | 9
 #define SYS_OPEN        SYS_CLASS_PATH | SYS_RET_FILE | 5
-#define SYS_MKDIR       SYS_CLASS_PATH | 39
+#define SYS_CHMOD       SYS_CLASS_PATH | 15
 #define SYS_RMDIR       SYS_CLASS_PATH | 84
 #define SYS_UNLINK      SYS_CLASS_PATH | 10
 
@@ -34,10 +38,14 @@ extern int errno;
 #define SYS_DUP         SYS_CLASS_FILE | SYS_RET_FILE | 41
 #define SYS_READ        SYS_CLASS_FILE | SYS_ARG_MSLICE | 3
 #define SYS_WRITE       SYS_CLASS_FILE | SYS_ARG_SLICE | 4
-#define SYS_FEVENT      SYS_CLASS_FILE | 927
 #define SYS_LSEEK       SYS_CLASS_FILE | 19
+#define SYS_FCNTL       SYS_CLASS_FILE | 55
+#define SYS_FEVENT      SYS_CLASS_FILE | 927
+#define SYS_FMAP        SYS_CLASS_FILE | 90
+#define SYS_FUNMAP      SYS_CLASS_FILE | 91
 #define SYS_FPATH       SYS_CLASS_FILE | SYS_ARG_MSLICE | 928
 #define SYS_FSTAT       SYS_CLASS_FILE | SYS_ARG_MSLICE | 28
+#define SYS_FSTATVFS    SYS_CLASS_FILE | SYS_ARG_MSLICE | 100
 #define SYS_FSYNC       SYS_CLASS_FILE | 118
 #define SYS_FTRUNCATE   SYS_CLASS_FILE | 93
 
@@ -50,12 +58,15 @@ extern int errno;
 #define SYS_FUTEX       240
 #define SYS_GETCWD      183
 #define SYS_GETEGID     202
+#define SYS_GETENS      951
 #define SYS_GETEUID     201
 #define SYS_GETGID      200
+#define SYS_GETNS       950
 #define SYS_GETPID      20
 #define SYS_GETUID      199
 #define SYS_IOPL        110
 #define SYS_KILL        37
+#define SYS_MKNS        984
 #define SYS_NANOSLEEP   162
 #define SYS_PHYSALLOC   945
 #define SYS_PHYSFREE    946
@@ -64,6 +75,7 @@ extern int errno;
 #define SYS_VIRTTOPHYS  949
 #define SYS_PIPE2       331
 #define SYS_SETREGID    204
+#define SYS_SETRENS     952
 #define SYS_SETREUID    203
 #define SYS_WAITPID     7
 #define SYS_YIELD       158

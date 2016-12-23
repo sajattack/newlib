@@ -2,8 +2,8 @@
 
 #include <sys/dirent.h>
 
-DIR *opendir(const char * path) {
-    int fd = open(path, O_RDONLY);
+DIR * _opendir(const char * path) {
+    int fd = _open(path, O_RDONLY | O_CLOEXEC | O_DIRECTORY, 0);
 
     if(fd >= 0){
         DIR * dir = (DIR *)calloc(sizeof(DIR), 1);
@@ -14,12 +14,12 @@ DIR *opendir(const char * path) {
     return NULL;
 }
 
-struct dirent *readdir(DIR * dir){
+struct dirent * _readdir(DIR * dir){
     if(dir){
         //TODO: Speed improvements
         int i;
         for(i = 0; i < 4096; ++i){
-            if(read(dir->dd_fd, &(dir->dd_ent.d_name[i]), 1) > 0){
+            if(_read(dir->dd_fd, &(dir->dd_ent.d_name[i]), 1) > 0){
                 if(dir->dd_ent.d_name[i] == '\n'){
                     break;
                 }
@@ -37,15 +37,15 @@ struct dirent *readdir(DIR * dir){
     return NULL;
 }
 
-void rewinddir(DIR * dir){
+void _rewinddir(DIR * dir){
     if(dir){
-        lseek(dir->dd_fd, 0, 0);
+        _lseek(dir->dd_fd, 0, 0);
     }
 }
 
-int closedir(DIR * dir){
+int _closedir(DIR * dir){
     if(dir){
-        close(dir->dd_fd);
+        _close(dir->dd_fd);
         free(dir);
         return 0;
     }

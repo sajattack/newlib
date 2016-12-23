@@ -8,14 +8,14 @@ int _execve(const char *name, const char **argv, const char **env) {
     return syscall3(SYS_EXECVE, (uint64_t)name, (uint64_t)argv, (uint64_t)env);
 }
 
-int fork() {
+int _fork() {
     return syscall1(SYS_CLONE, 0);
 }
 
-char * getcwd(char * buf, size_t size) {
+char * _getcwd(char * buf, size_t size) {
     char * cwd = NULL;
 
-    int file = open(".", 0);
+    int file = _open(".", O_CLOEXEC | O_STAT, 0);
     if(file >= 0){
         if(!buf){
             if(size == 0){
@@ -23,45 +23,45 @@ char * getcwd(char * buf, size_t size) {
             }
             buf = (char *)calloc(size, 1);
 
-            if(fpath(file, buf, size) >= 0){
+            if(_fpath(file, buf, size) >= 0){
                 cwd = buf;
             }else{
                 free(buf);
             }
         }else{
             memset(buf, 0, size);
-            if(fpath(file, buf, size) >= 0){
+            if(_fpath(file, buf, size) >= 0){
                 cwd = buf;
             }
         }
-        close(file);
+        _close(file);
     }
 
     return cwd;
 }
 
 
-pid_t getpid() {
+pid_t _getpid() {
     return syscall0(SYS_GETPID);
 }
 
-gid_t getegid() {
+gid_t _getegid() {
     return syscall0(SYS_GETEGID);
 }
 
-uid_t geteuid() {
+uid_t _geteuid() {
     return syscall0(SYS_GETEUID);
 }
 
-gid_t getgid() {
+gid_t _getgid() {
     return syscall0(SYS_GETGID);
 }
 
-uid_t getuid() {
+uid_t _getuid() {
     return syscall0(SYS_GETUID);
 }
 
-int kill(int pid, int sig) {
+int _kill(int pid, int sig) {
     return syscall2(SYS_KILL, pid, sig);
 }
 
@@ -71,7 +71,7 @@ void * __brk(void * addr) {
 
 static char *curr_brk = NULL;
 
-int brk(void *end_data_segment) {
+int _brk(void *end_data_segment) {
     char *new_brk;
 
     new_brk = __brk(end_data_segment);
@@ -80,7 +80,7 @@ int brk(void *end_data_segment) {
     return 0;
 }
 
-void * sbrk(ptrdiff_t increment) {
+void * _sbrk(ptrdiff_t increment) {
     char *old_brk,*new_brk;
 
     if (!curr_brk) curr_brk = __brk(NULL);
@@ -91,7 +91,7 @@ void * sbrk(ptrdiff_t increment) {
     return old_brk;
 }
 
-int sched_yield() {
+int _sched_yield() {
     return syscall0(SYS_YIELD);
 }
 
@@ -104,7 +104,7 @@ int _system(char * s){
         return -1;
     } else {
         int status = 0;
-        int rc = waitpid(pid, &status, 0);
+        int rc = _waitpid(pid, &status, 0);
         if (rc < 0) {
             return -1;
         }
@@ -112,18 +112,18 @@ int _system(char * s){
     }
 }
 
-int setregid(gid_t rgid, gid_t egid) {
+int _setregid(gid_t rgid, gid_t egid) {
     return syscall2(SYS_SETREGID, rgid, egid);
 }
 
-int setreuid(uid_t ruid, gid_t euid) {
+int _setreuid(uid_t ruid, gid_t euid) {
     return syscall2(SYS_SETREUID, ruid, euid);
 }
 
-pid_t wait(int * status) {
-    return waitpid(-1, status, 0);
+pid_t _wait(int * status) {
+    return _waitpid(-1, status, 0);
 }
 
-pid_t waitpid(pid_t pid, int * status, int options) {
+pid_t _waitpid(pid_t pid, int * status, int options) {
     return syscall3(SYS_WAITPID, (uint64_t)pid, (uint64_t)status, (uint64_t)options);
 }
