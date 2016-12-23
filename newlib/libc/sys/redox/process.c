@@ -65,13 +65,30 @@ int kill(int pid, int sig) {
     return syscall2(SYS_KILL, pid, sig);
 }
 
-void * sbrk(ptrdiff_t increment){
-    char * curr_brk = (char *)syscall1(SYS_BRK, 0);
-    char * new_brk = (char *)syscall1(SYS_BRK, (uint64_t)(curr_brk + increment));
-    if (new_brk != curr_brk + increment){
-        return (void *) -1;
-    }
-    return curr_brk;
+void * __brk(void * addr) {
+    (void *)syscall1(SYS_BRK, (uint64_t)addr);
+}
+
+static char *curr_brk = NULL;
+
+int brk(void *end_data_segment) {
+     char *new_brk;
+
+     new_brk = __brk(end_data_segment);
+     if (new_brk != end_data_segment) return -1;
+     curr_brk = new_brk;
+     return 0;
+}
+
+void * sbrk(ptrdiff_t increment) {
+    char *old_brk,*new_brk;
+
+    if (!curr_brk) curr_brk = __brk(NULL);
+    new_brk = __brk(curr_brk+increment);
+    if (new_brk != curr_brk+increment) return (void *) -1;
+    old_brk = curr_brk;
+    curr_brk = new_brk;
+    return old_brk;
 }
 
 int sched_yield() {
