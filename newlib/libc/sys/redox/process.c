@@ -104,7 +104,7 @@ int _system(char * s){
         return -1;
     } else {
         int status = 0;
-        int rc = _waitpid(pid, &status, 0);
+        int rc = waitpid(pid, &status, 0);
         if (rc < 0) {
             return -1;
         }
@@ -121,9 +121,9 @@ int _setreuid(uid_t ruid, gid_t euid) {
 }
 
 pid_t _wait(int * status) {
-    return _waitpid(-1, status, 0);
+    return waitpid(-1, status, 0);
 }
 
-pid_t _waitpid(pid_t pid, int * status, int options) {
+pid_t waitpid(pid_t pid, int * status, int options) {
     return syscall3(SYS_WAITPID, (uint64_t)pid, (uint64_t)status, (uint64_t)options);
 }
