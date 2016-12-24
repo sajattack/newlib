@@ -12,10 +12,6 @@
 #undef errno
 extern int errno;
 
-#define O_CLOEXEC       0x01000000
-#define O_DIRECTORY     0x10000000
-#define O_STAT          0x20000000
-
 #define SYS_CLASS       0xF0000000
 #define SYS_CLASS_PATH  0x10000000
 #define SYS_CLASS_FILE  0x20000000
