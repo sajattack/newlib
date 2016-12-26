@@ -26,7 +26,7 @@ int _fpath(int file, char * buf, int len) {
 }
 
 int _fstat(int file, struct stat *st) {
-    return syscall3(SYS_FSTAT, (uint64_t)file, (uint64_t)st, sizeof(stat));
+    return syscall3(SYS_FSTAT, (uint64_t)file, (uint64_t)st, sizeof(struct stat));
 }
 
 int _fsync(int file) {
