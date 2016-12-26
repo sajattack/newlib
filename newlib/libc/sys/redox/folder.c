@@ -10,10 +10,13 @@ DIR * opendir(const char * path) {
         if(dir != NULL){
             dir->dd_fd = fd;
             return dir;
+        } else {
+            close(fd);
+            return NULL;
         }
+    } else {
+        return NULL;
     }
-
-    return NULL;
 }
 
 struct dirent * readdir(DIR * dir){

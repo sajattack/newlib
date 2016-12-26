@@ -1,11 +1,13 @@
 /* note these headers are all provided by newlib - you don't need to provide them */
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/fcntl.h>
-#include <sys/times.h>
+#include <sys/dirent.h>
 #include <sys/errno.h>
+#include <sys/fcntl.h>
+#include <sys/stat.h>
+#include <sys/times.h>
 #include <sys/time.h>
+#include <sys/types.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <errno.h>
