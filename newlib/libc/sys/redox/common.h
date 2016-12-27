@@ -35,6 +35,7 @@ extern int errno;
 
 #define SYS_CLOSE       SYS_CLASS_FILE | 6
 #define SYS_DUP         SYS_CLASS_FILE | SYS_RET_FILE | 41
+#define SYS_DUP2        SYS_CLASS_FILE | SYS_RET_FILE | 63
 #define SYS_READ        SYS_CLASS_FILE | SYS_ARG_MSLICE | 3
 #define SYS_WRITE       SYS_CLASS_FILE | SYS_ARG_SLICE | 4
 #define SYS_LSEEK       SYS_CLASS_FILE | 19

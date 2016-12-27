@@ -21,10 +21,6 @@ int _chown(const char *path, uid_t owner, gid_t group) {
     UNIMPL(EACCES);
 }
 
-int dup2(int oldfd, int newfd) {
-    UNIMPL(EBADF);
-}
-
 int _fcntl(int file, int cmd, ...){
     UNIMPL(EACCES);
 }
@@ -58,7 +54,7 @@ int _ioctl(int file, int request, ...) {
 }
 
 //TODO: Actually implement lstat, it currently just calls stat
-int _lstat(const char *__restrict path, struct stat *__restrict sbuf) {
+int lstat(const char *__restrict path, struct stat *__restrict sbuf) {
     return _stat(path, sbuf);
 }
 
@@ -66,7 +62,7 @@ int _link(const char *old, const char *new) {
     UNIMPL(EPERM);
 }
 
-long _sysconf(int name) {
+long sysconf(int name) {
     UNIMPL(EINVAL);
 }
 
@@ -83,6 +79,6 @@ int _utime(const char * filename, const struct utimbuf * times) {
     UNIMPL(EACCES);
 }
 
-int _vfork() {
+int vfork() {
     return _fork();
 }

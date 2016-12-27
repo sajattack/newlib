@@ -9,16 +9,16 @@ int access(const char * path, int amode){
     return 0;
 }
 
-int _chdir(const char *path){
-    return syscall2(SYS_CHDIR, (uint64_t)path, (uint64_t)strlen(path));
-}
-
 int _close(int file){
     return syscall1(SYS_CLOSE, (uint64_t)file);
 }
 
 int _dup(int file){
-    return syscall1(SYS_DUP, (uint64_t)file);
+    return syscall3(SYS_DUP, (uint64_t)file, 0, 0);
+}
+
+int dup2(int file, int newfile){
+    return syscall4(SYS_DUP2, (uint64_t)file, (uint64_t)newfile, 0, 0);
 }
 
 int _fpath(int file, char * buf, int len) {

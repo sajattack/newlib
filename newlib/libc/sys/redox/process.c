@@ -1,5 +1,9 @@
 #include "common.h"
 
+int chdir(const char *path){
+    return syscall2(SYS_CHDIR, (uint64_t)path, (uint64_t)strlen(path));
+}
+
 void _exit(int code){
     syscall1(SYS_EXIT, (uint64_t)code);
 }
