@@ -8,7 +8,7 @@
     return -1; \
 }
 
-unsigned int _alarm(unsigned int seconds) {
+unsigned int alarm(unsigned int seconds) {
     fprintf(stderr, "unimplemented: alarm");
     return 0;
 }
@@ -21,7 +21,7 @@ int _chown(const char *path, uid_t owner, gid_t group) {
     UNIMPL(EACCES);
 }
 
-int _dup2(int oldfd, int newfd) {
+int dup2(int oldfd, int newfd) {
     UNIMPL(EBADF);
 }
 

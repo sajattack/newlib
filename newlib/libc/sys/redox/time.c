@@ -19,6 +19,6 @@ int _gettimeofday(struct timeval *__restrict tv, void *__restrict tz){
     }
 }
 
-int _nanosleep(const struct timespec * req, struct timespec * rem){
+int nanosleep(const struct timespec * req, struct timespec * rem){
     return syscall2(SYS_NANOSLEEP, (uint64_t)req, (uint64_t)rem);
 }

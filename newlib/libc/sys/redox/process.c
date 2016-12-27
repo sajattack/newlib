@@ -40,6 +40,24 @@ char * _getcwd(char * buf, size_t size) {
     return cwd;
 }
 
+#ifndef MAXPATHLEN
+#define MAXPATHLEN 1024
+#endif
+
+char * getwd(char *buf) {
+    char tmp[MAXPATHLEN];
+
+    if (buf == NULL) {
+        errno = EINVAL;
+        return NULL;
+    }
+
+    if (_getcwd (tmp, MAXPATHLEN) == NULL) {
+        return NULL;
+    }
+
+    return strncpy (buf, tmp, MAXPATHLEN);
+}
 
 pid_t _getpid() {
     return syscall0(SYS_GETPID);

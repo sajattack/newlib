@@ -1,6 +1,6 @@
 #include "common.h"
 
-int _access(const char * path, int amode){
+int access(const char * path, int amode){
     int fd = _open(path, O_CLOEXEC | O_STAT, 0);
     if(fd < 0){
         return fd;
@@ -41,7 +41,7 @@ int _lseek(int file, int ptr, int dir) {
     return syscall3(SYS_LSEEK, (uint64_t)file, (uint64_t)ptr, (uint64_t)dir);
 }
 
-int _mkdir(const char * path, mode_t mode) {
+int mkdir(const char * path, mode_t mode) {
     int fd = _open(path, O_CREAT | O_EXCL | O_CLOEXEC | O_DIRECTORY, mode);
     if(fd < 0){
         return fd;
@@ -54,11 +54,11 @@ int _open(const char *path, int flags, mode_t mode) {
     return syscall3(SYS_OPEN, (uint64_t)path, (uint64_t)strlen(path), (uint64_t)flags | (uint64_t)(mode & 0777));
 }
 
-int _pipe(int pipefd[2]) {
+int pipe(int pipefd[2]) {
     return syscall2(SYS_PIPE2, (uint64_t)pipefd, 0);
 }
 
-int _pipe2(int pipefd[2], int flags) {
+int pipe2(int pipefd[2], int flags) {
     return syscall2(SYS_PIPE2, (uint64_t)pipefd, (uint64_t)flags);
 }
 
