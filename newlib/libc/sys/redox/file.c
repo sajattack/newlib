@@ -55,11 +55,15 @@ int _open(const char *path, int flags, mode_t mode) {
 }
 
 int pipe(int pipefd[2]) {
-    return syscall2(SYS_PIPE2, (uint64_t)pipefd, 0);
+    return pipe2(pipefd, 0);
 }
 
 int pipe2(int pipefd[2], int flags) {
-    return syscall2(SYS_PIPE2, (uint64_t)pipefd, (uint64_t)flags);
+    uint64_t syspipefd[2];
+    int ret = syscall2(SYS_PIPE2, (uint64_t)syspipefd, (uint64_t)flags);
+    pipefd[0] = (int)syspipefd[0];
+    pipefd[1] = (int)syspipefd[1];
+    return ret;
 }
 
 int _read(int file, char *ptr, int len) {
