@@ -60,6 +60,8 @@ int pipe(int pipefd[2]) {
 
 int pipe2(int pipefd[2], int flags) {
     uint64_t syspipefd[2];
+    syspipefd[0] = (uint64_t)pipefd[0];
+    syspipefd[1] = (uint64_t)pipefd[1];
     int ret = syscall2(SYS_PIPE2, (uint64_t)syspipefd, (uint64_t)flags);
     pipefd[0] = (int)syspipefd[0];
     pipefd[1] = (int)syspipefd[1];
