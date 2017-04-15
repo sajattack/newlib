@@ -13,10 +13,6 @@ unsigned int alarm(unsigned int seconds) {
     return 0;
 }
 
-int _chmod(const char * path, mode_t mode) {
-    UNIMPL(EACCES);
-}
-
 int _chown(const char *path, uid_t owner, gid_t group) {
     UNIMPL(EACCES);
 }
