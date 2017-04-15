@@ -5,6 +5,8 @@
 extern char ** environ;
 extern int main(int argc, char ** argv);
 
+void *__dso_handle = NULL;
+
 __attribute__((naked)) void _start() {
     asm volatile(
         ".intel_syntax noprefix;"
