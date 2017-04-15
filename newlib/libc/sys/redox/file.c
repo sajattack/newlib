@@ -72,7 +72,7 @@ int _read(int file, char *ptr, int len) {
     return syscall3(SYS_READ, (uint64_t)file, (uint64_t)ptr, (uint64_t)len);
 }
 
-int _rmdir(const char * path){
+int rmdir(const char * path){
     return syscall2(SYS_RMDIR, (uint64_t)path, (uint64_t)strlen(path));
 }
 
