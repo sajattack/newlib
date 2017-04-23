@@ -9,7 +9,17 @@ void _exit(int code){
 }
 
 int _execve(const char *name, const char **argv, const char **env) {
-    return syscall3(SYS_EXECVE, (uint64_t)name, (uint64_t)argv, (uint64_t)env);
+    // XXX Handle env
+    int narg;
+    for (narg=0; argv[narg] != NULL; narg++);
+    char **argv2 = malloc(2 * narg * sizeof(char*));
+    for (int i=0; i < narg; i++) {
+        argv2[i*2] = argv[i];
+        argv2[i*2+1] = strlen(argv[i]);
+    }
+    int ret = syscall4(SYS_EXECVE, (uint64_t)name, (uint64_t)strlen(name), (uint64_t)argv2, (uint64_t)narg);
+    free(argv2);
+    return ret;
 }
 
 int _fork() {
