@@ -52,8 +52,8 @@ pub unsafe extern "C" fn _execve(name: *const c_char, argv: *const *const c_char
     
     let mut args: Vec<[usize; 2]> = Vec::new();
     let mut arg = argv;
-    while (*arg).is_null() {
-        args.push([arg as usize, CStr::from_ptr(*arg).to_bytes().len()]);
+    while !(*arg).is_null() {
+        args.push([*arg as usize, CStr::from_ptr(*arg).to_bytes().len()]);
         arg = arg.offset(1);
     }
 
