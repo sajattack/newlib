@@ -1,57 +1,7 @@
 #include "common.h"
 
-int chdir(const char *path){
-    return syscall2(SYS_CHDIR, (uint64_t)path, (uint64_t)strlen(path));
-}
-
 void _exit(int code){
     syscall1(SYS_EXIT, (uint64_t)code);
-}
-
-int _execve(const char *name, const char **argv, const char **env) {
-    // XXX Handle env
-    int narg;
-    for (narg=0; argv[narg] != NULL; narg++);
-    char **argv2 = malloc(2 * narg * sizeof(char*));
-    for (int i=0; i < narg; i++) {
-        argv2[i*2] = argv[i];
-        argv2[i*2+1] = strlen(argv[i]);
-    }
-    int ret = syscall4(SYS_EXECVE, (uint64_t)name, (uint64_t)strlen(name), (uint64_t)argv2, (uint64_t)narg);
-    free(argv2);
-    return ret;
-}
-
-int _fork() {
-    return syscall1(SYS_CLONE, 0);
-}
-
-char * _getcwd(char * buf, size_t size) {
-    char * cwd = NULL;
-
-    int file = _open(".", O_CLOEXEC | O_STAT, 0);
-    if(file >= 0){
-        if(!buf){
-            if(size == 0){
-                size = 4096;
-            }
-            buf = (char *)calloc(size, 1);
-
-            if(_fpath(file, buf, size) >= 0){
-                cwd = buf;
-            }else{
-                free(buf);
-            }
-        }else{
-            memset(buf, 0, size);
-            if(_fpath(file, buf, size) >= 0){
-                cwd = buf;
-            }
-        }
-        _close(file);
-    }
-
-    return cwd;
 }
 
 #ifndef MAXPATHLEN

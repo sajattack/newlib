@@ -16,9 +16,8 @@ else
 extra_objs =
 endif
 
-lib_a_SOURCES =
 lib_a_LIBADD = $(extra_objs)
-EXTRA_lib_a_SOURCES = \
+lib_a_SOURCES = \
     common.c \
     file.c \
     folder.c \
@@ -29,6 +28,19 @@ EXTRA_lib_a_SOURCES = \
 lib_a_DEPENDENCIES = $(extra_objs)
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
+
+$(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a: Cargo.toml src/lib.rs
+	cd $(srcdir); CC=x86_64-elf-redox-gcc xargo build --target x86_64-unknown-redox --release
+
+# Modified from sys/phoenix
+lib.a: $(extra_objs) $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a
+	rm -f $@
+	rm -rf tmp
+	mkdir tmp
+	cd tmp; ar x $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a
+	$(AR) $(AR_FLAGS) $@ tmp/*.o $(extra_objs)
+	$(RANLIB) $@
+	rm -rf tmp
 
 if MAY_SUPPLY_SYSCALLS
 all: crt0.o
