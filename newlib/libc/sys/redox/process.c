@@ -29,26 +29,24 @@ int _fork() {
 char * getcwd(char * buf, size_t size) {
     char * cwd = NULL;
 
-    int file = _open(".", O_CLOEXEC | O_STAT, 0);
-    if(file >= 0){
-        if(!buf){
-            if(size == 0){
-                size = 4096;
-            }
-            buf = (char *)calloc(size, 1);
-
-            if(_fpath(file, buf, size) >= 0){
-                cwd = buf;
-            }else{
-                free(buf);
-            }
-        }else{
-            memset(buf, 0, size);
-            if(_fpath(file, buf, size) >= 0){
-                cwd = buf;
-            }
+    if(!buf){
+        if(size == 0){
+            size = 4096;
         }
-        _close(file);
+        buf = (char *)calloc(size, 1);
+
+        int ret = syscall2(SYS_GETCWD, (uint64_t)buf, (uint64_t)size);
+        if(ret != -1){
+            cwd = buf;
+        }else{
+            free(buf);
+        }
+    }else{
+        memset(buf, 0, size);
+        int ret = syscall2(SYS_GETCWD, (uint64_t)buf, (uint64_t)size);
+        if(ret != -1){
+            cwd = buf;
+        }
     }
 
     return cwd;
