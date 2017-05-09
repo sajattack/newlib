@@ -99,3 +99,7 @@ int _write(int file, const char *ptr, int len) {
 int chmod(const char * path, mode_t mode) {
     return syscall3(SYS_CHMOD, (uint64_t)path, (uint64_t)strlen(path), (uint64_t)mode);
 }
+
+int ftruncate(int file, off_t len) {
+    return syscall2(SYS_FTRUNCATE, (uint64_t)file, (uint64_t)len);
+}
