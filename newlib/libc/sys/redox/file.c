@@ -13,7 +13,7 @@ int _close(int file){
     return syscall1(SYS_CLOSE, (uint64_t)file);
 }
 
-int _dup(int file){
+int dup(int file){
     return syscall3(SYS_DUP, (uint64_t)file, 0, 0);
 }
 
