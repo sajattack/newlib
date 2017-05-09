@@ -157,3 +157,11 @@ pid_t _wait(int * status) {
 pid_t waitpid(pid_t pid, int * status, int options) {
     return syscall3(SYS_WAITPID, (uint64_t)pid, (uint64_t)status, (uint64_t)options);
 }
+
+uid_t getuid(void) {
+    return syscall0(SYS_GETUID);
+}
+
+uid_t getgid(void) {
+    return syscall0(SYS_GETGID);
+}
