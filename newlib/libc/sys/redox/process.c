@@ -26,7 +26,7 @@ int _fork() {
     return syscall1(SYS_CLONE, 0);
 }
 
-char * _getcwd(char * buf, size_t size) {
+char * getcwd(char * buf, size_t size) {
     char * cwd = NULL;
 
     int file = _open(".", O_CLOEXEC | O_STAT, 0);
@@ -66,7 +66,7 @@ char * getwd(char *buf) {
         return NULL;
     }
 
-    if (_getcwd (tmp, MAXPATHLEN) == NULL) {
+    if (getcwd (tmp, MAXPATHLEN) == NULL) {
         return NULL;
     }
 
