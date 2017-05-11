@@ -72,6 +72,7 @@ macro_rules! try_call {
 /// }
 /// ```
 macro_rules! libc_fn {
+    // Call with arguments and return value
     ($name:ident($($aname:ident : $atype:ty),+) -> $rtype:ty $content:block) => {
         #[no_mangle]
         pub extern "C" fn $name($($aname: $atype,)+) -> $rtype {
@@ -82,6 +83,7 @@ macro_rules! libc_fn {
             unsafe { try_call!(internal($($aname,)+)) }
         }
     };
+    // Call without arguments
     ($name:ident() -> $rtype:ty $content:block) => {
         #[no_mangle]
         pub extern "C" fn $name() -> $rtype {
@@ -92,6 +94,7 @@ macro_rules! libc_fn {
             unsafe { try_call!(internal()) }
         }
     };
+    // Call with `unsafe` keyword (and arguments, return value)
     (unsafe $name:ident($($aname:ident : $atype:ty),+) -> $rtype:ty $content:block) => {
         #[no_mangle]
         pub unsafe extern "C" fn $name($($aname: $atype,)+) -> $rtype {
@@ -102,6 +105,7 @@ macro_rules! libc_fn {
             try_call!(internal($($aname,)+))
         }
     };
+    // Call with `unsafe` keyword, no arguments
     (unsafe $name:ident() -> $rtype:ty $content:block) => {
         #[no_mangle]
         pub unsafe extern "C" fn $name() -> $rtype {
@@ -112,6 +116,7 @@ macro_rules! libc_fn {
             try_call!(internal())
         }
     };
+    // The next four cases handle calls with no return value
     ($name:ident($($aname:ident : $atype:ty),+) $content:block) => {
         #[no_mangle]
         pub extern "C" fn $name($($aname: $atype,)+) {
