@@ -4,7 +4,6 @@ extern crate libc;
 use std::ffi::CStr;
 use libc::{c_char, c_int, c_void, size_t};
 use std::slice;
-use syscall::{O_CLOEXEC, O_STAT};
 use std::ptr::null;
 
 #[macro_use]
@@ -55,10 +54,7 @@ libc_fn!(unsafe _getcwd(buf: *mut c_char, size: size_t) -> *const c_char {
             return Ok(null());
         }
     } 
-    let slice = slice::from_raw_parts_mut(buf as *mut u8, size);
-    let fd = syscall::open(".", O_CLOEXEC | O_STAT)?;
-    syscall::fpath(fd, slice)?;
-    syscall::close(fd)?;
+    syscall::getcwd(slice::from_raw_parts_mut(buf as *mut u8, size))?;
     Ok(buf)
     // FIXME: buffer too small; free buf when allocated
 });
