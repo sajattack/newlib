@@ -23,33 +23,21 @@ impl<T: Any> Into<*mut T> for Fail {
     }
 }
 
-impl Into<i8> for Fail {
-    #[inline(always)]
-    fn into(self) -> i8 {
-        -1
-    }
+macro_rules! int_fail {
+    ($type:ty) => (
+        impl Into<$type> for Fail {
+            #[inline(always)]
+            fn into(self) -> $type {
+                -1
+            }
+        }
+    )
 }
 
-impl Into<i16> for Fail {
-    #[inline(always)]
-    fn into(self) -> i16 {
-        -1
-    }
-}
-
-impl Into<i32> for Fail {
-    #[inline(always)]
-    fn into(self) -> i32 {
-        -1
-    }
-}
-
-impl Into<i64> for Fail {
-    #[inline(always)]
-    fn into(self) -> i64 {
-        -1
-    }
-}
+int_fail!(i8);
+int_fail!(i16);
+int_fail!(i32);
+int_fail!(i64);
 
 macro_rules! try_call {
     ($res:expr) => (
