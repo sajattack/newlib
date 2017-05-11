@@ -1,13 +1,9 @@
 use std::ffi::CStr;
-use libc::{c_char, c_int, c_void, size_t};
+use libc::{c_char, c_int, size_t};
 use std::slice;
 use std::ptr::null;
 use syscall;
-
-
-extern {
-    fn malloc(size: size_t) -> *mut c_void;
-}
+use ::malloc;
 
 
 libc_fn!(unsafe chdir(path: *const c_char) -> c_int {

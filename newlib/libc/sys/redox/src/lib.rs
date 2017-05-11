@@ -1,14 +1,15 @@
 extern crate syscall;
 extern crate libc;
 
-use libc::c_int;
+use libc::{c_int, c_void, size_t};
 
 #[macro_use]
 mod macros;
 pub mod process;
 
 extern {
-    static mut errno: c_int;
+    pub static mut errno: c_int;
+    pub fn malloc(size: size_t) -> *mut c_void;
 }
 
 #[no_mangle]

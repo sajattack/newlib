@@ -1,11 +1,6 @@
 use std::ptr;
 use std::any::Any;
-use libc::c_int;
 
-
-extern {
-    pub static mut errno: c_int;
-}
 
 /// This struct converts to `NULL` for raw pointers, and `-1` for signed
 /// integers.
@@ -48,7 +43,7 @@ macro_rules! try_call {
         match $res {
             Ok(val) => val,
             Err(err) => {
-                ::macros::errno = err.errno;
+                ::errno = err.errno;
                 return ::macros::Fail.into();
             }
         }
