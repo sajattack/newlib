@@ -13,7 +13,7 @@ int _close(int file){
     return syscall1(SYS_CLOSE, (uint64_t)file);
 }
 
-int _dup(int file){
+int dup(int file){
     return syscall3(SYS_DUP, (uint64_t)file, 0, 0);
 }
 
@@ -98,4 +98,8 @@ int _write(int file, const char *ptr, int len) {
 
 int chmod(const char * path, mode_t mode) {
     return syscall3(SYS_CHMOD, (uint64_t)path, (uint64_t)strlen(path), (uint64_t)mode);
+}
+
+int ftruncate(int file, off_t len) {
+    return syscall2(SYS_FTRUNCATE, (uint64_t)file, (uint64_t)len);
 }
