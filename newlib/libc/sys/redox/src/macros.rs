@@ -7,6 +7,8 @@ extern {
     pub static mut errno: c_int;
 }
 
+/// This struct converts to `NULL` for raw pointers, and `-1` for signed
+/// integers.
 pub struct Fail;
 
 impl<T: Any> Into<*const T> for Fail {
@@ -39,6 +41,8 @@ int_fail!(i16);
 int_fail!(i32);
 int_fail!(i64);
 
+/// If `res` is `Err(..)`, set `errno` and return `-1` or `NULL`, otherwise
+/// unwrap.
 macro_rules! try_call {
     ($res:expr) => (
         match $res {
@@ -51,6 +55,22 @@ macro_rules! try_call {
     );
 }
 
+/// Declares a libc function. The body should return syscall::Result, which
+/// is used to set errno on error with try_call!
+///
+/// ```
+/// libc_fn!(foo(arg: c_int) -> c_int) {
+///     Ok(arg)
+/// }
+/// ```
+///
+/// The `unsafe` keyword can be added to make the function unsafe:
+///
+/// ```
+/// libc_fn!(unsafe foo(arg: c_int) -> c_int) {
+///     Ok(arg)
+/// }
+/// ```
 macro_rules! libc_fn {
     ($name:ident($($aname:ident : $atype:ty),+) -> $rtype:ty $content:block) => {
         #[no_mangle]
