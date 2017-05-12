@@ -68,71 +68,37 @@ macro_rules! try_call {
 /// ```
 macro_rules! libc_fn {
     // Call with arguments and return value
-    ($name:ident($($aname:ident : $atype:ty),+) -> $rtype:ty $content:block) => {
+    ($name:ident($($aname:ident : $atype:ty),*) -> $rtype:ty $content:block) => {
         #[no_mangle]
-        pub extern "C" fn $name($($aname: $atype,)+) -> $rtype {
+        pub extern "C" fn $name($($aname: $atype,)*) -> $rtype {
             #[inline(always)]
-            fn internal($($aname: $atype,)+) -> ::syscall::Result<$rtype> {
+            fn internal($($aname: $atype,)*) -> ::syscall::Result<$rtype> {
                 $content
             }
-            unsafe { try_call!(internal($($aname,)+)) }
-        }
-    };
-    // Call without arguments
-    ($name:ident() -> $rtype:ty $content:block) => {
-        #[no_mangle]
-        pub extern "C" fn $name() -> $rtype {
-            #[inline(always)]
-            fn internal() -> ::syscall::Result<$rtype> {
-                $content
-            }
-            unsafe { try_call!(internal()) }
+            unsafe { try_call!(internal($($aname,)*)) }
         }
     };
     // Call with `unsafe` keyword (and arguments, return value)
-    (unsafe $name:ident($($aname:ident : $atype:ty),+) -> $rtype:ty $content:block) => {
+    (unsafe $name:ident($($aname:ident : $atype:ty),*) -> $rtype:ty $content:block) => {
         #[no_mangle]
-        pub unsafe extern "C" fn $name($($aname: $atype,)+) -> $rtype {
+        pub unsafe extern "C" fn $name($($aname: $atype,)*) -> $rtype {
             #[inline(always)]
-            unsafe fn internal($($aname: $atype,)+) -> ::syscall::Result<$rtype> {
+            unsafe fn internal($($aname: $atype,)*) -> ::syscall::Result<$rtype> {
                 $content
             }
-            try_call!(internal($($aname,)+))
-        }
-    };
-    // Call with `unsafe` keyword, no arguments
-    (unsafe $name:ident() -> $rtype:ty $content:block) => {
-        #[no_mangle]
-        pub unsafe extern "C" fn $name() -> $rtype {
-            #[inline(always)]
-            unsafe fn internal() -> ::syscall::Result<$rtype> {
-                $content
-            }
-            try_call!(internal())
+            try_call!(internal($($aname,)*))
         }
     };
     // The next four cases handle calls with no return value
-    ($name:ident($($aname:ident : $atype:ty),+) $content:block) => {
+    ($name:ident($($aname:ident : $atype:ty),*) $content:block) => {
         #[no_mangle]
-        pub extern "C" fn $name($($aname: $atype,)+) {
+        pub extern "C" fn $name($($aname: $atype,)*) {
             $content
         }
     };
-    ($name:ident() -> $content:block) => {
+    (unsafe $name:ident($($aname:ident : $atype:ty),*) $content:block) => {
         #[no_mangle]
-        pub extern "C" fn $name() {
-            $content
-        }
-    };
-    (unsafe $name:ident($($aname:ident : $atype:ty),+) $content:block) => {
-        #[no_mangle]
-        pub unsafe extern "C" fn $name($($aname: $atype,)+) {
-            $content
-        }
-    };
-    (unsafe $name:ident() $content:block) => {
-        #[no_mangle]
-        pub unsafe extern "C" fn $name() {
+        pub unsafe extern "C" fn $name($($aname: $atype,)*) {
             $content
         }
     };
