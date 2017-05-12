@@ -89,7 +89,7 @@ macro_rules! libc_fn {
             try_call!(internal($($aname,)*))
         }
     };
-    // The next four cases handle calls with no return value
+    // The next 2 cases handle calls with no return value
     ($name:ident($($aname:ident : $atype:ty),*) $content:block) => {
         #[no_mangle]
         pub extern "C" fn $name($($aname: $atype,)*) {
