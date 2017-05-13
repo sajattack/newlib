@@ -88,3 +88,18 @@ libc_fn!(unsafe _stat(path: *mut c_char, st: *mut syscall::Stat) -> c_int {
     let _ = syscall::close(fd);
     Ok(ret)
 });
+
+libc_fn!(unsafe _unlink(path: *mut c_char) -> c_int {
+    let path = CStr::from_ptr(path).to_string_lossy();
+    Ok(syscall::unlink(&path)? as c_int)
+});
+
+libc_fn!(unsafe _write(file: c_int, buf: *const c_char, len: c_int) -> c_int {
+    let buf = slice::from_raw_parts(buf as *const u8, len as usize);
+    Ok(syscall::write(file as usize, buf)? as c_int)
+});
+
+libc_fn!(unsafe chmod(path: *mut c_char, mode: mode_t) -> c_int {
+    let path = CStr::from_ptr(path).to_string_lossy();
+    Ok(syscall::chmod(&path, mode as usize)? as c_int)
+});

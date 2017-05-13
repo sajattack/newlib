@@ -7,7 +7,6 @@ noinst_LIBRARIES = lib.a
 if MAY_SUPPLY_SYSCALLS
 extra_objs = \
     common.o \
-    file.o \
     folder.o \
     process.o \
     time.o \
@@ -19,7 +18,6 @@ endif
 lib_a_LIBADD = $(extra_objs)
 lib_a_SOURCES = \
     common.c \
-    file.c \
     folder.c \
     process.c \
     time.c \
@@ -29,7 +27,13 @@ lib_a_DEPENDENCIES = $(extra_objs)
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 
-$(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a: Cargo.toml src/lib.rs src/macros.rs src/process.rs
+rust_sources = \
+    src/lib.rs \
+    src/macros.rs \
+    src/process.rs \
+    src/file.rs
+
+$(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a: Cargo.toml $(rust_sources)
 	cd $(srcdir); CC=x86_64-elf-redox-gcc xargo build --target x86_64-unknown-redox --release
 
 # Modified from sys/phoenix
