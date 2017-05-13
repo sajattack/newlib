@@ -9,7 +9,6 @@ extra_objs = \
     common.o \
     folder.o \
     process.o \
-    time.o \
     unimpl.o
 else
 extra_objs =
@@ -20,7 +19,6 @@ lib_a_SOURCES = \
     common.c \
     folder.c \
     process.c \
-    time.c \
     unimpl.c \
     crt0.c
 lib_a_DEPENDENCIES = $(extra_objs)
@@ -31,7 +29,8 @@ rust_sources = \
     src/lib.rs \
     src/macros.rs \
     src/process.rs \
-    src/file.rs
+    src/file.rs \
+    src/time.rs
 
 $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a: Cargo.toml $(rust_sources)
 	cd $(srcdir); CC=x86_64-elf-redox-gcc xargo build --target x86_64-unknown-redox --release

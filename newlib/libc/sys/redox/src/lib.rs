@@ -7,6 +7,7 @@ use libc::{c_int, c_void, size_t};
 mod macros;
 pub mod process;
 pub mod file;
+pub mod time;
 
 extern {
     pub static mut errno: c_int;
