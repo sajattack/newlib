@@ -1,56 +1,5 @@
 #include "common.h"
 
-void _exit(int code){
-    syscall1(SYS_EXIT, (uint64_t)code);
-}
-
-#ifndef MAXPATHLEN
-#define MAXPATHLEN 1024
-#endif
-
-char * getwd(char *buf) {
-    char tmp[MAXPATHLEN];
-
-    if (buf == NULL) {
-        errno = EINVAL;
-        return NULL;
-    }
-
-    if (getcwd (tmp, MAXPATHLEN) == NULL) {
-        return NULL;
-    }
-
-    return strncpy (buf, tmp, MAXPATHLEN);
-}
-
-pid_t _getpid() {
-    return syscall0(SYS_GETPID);
-}
-
-gid_t _getegid() {
-    return syscall0(SYS_GETEGID);
-}
-
-uid_t _geteuid() {
-    return syscall0(SYS_GETEUID);
-}
-
-gid_t _getgid() {
-    return syscall0(SYS_GETGID);
-}
-
-uid_t _getuid() {
-    return syscall0(SYS_GETUID);
-}
-
-int _kill(int pid, int sig) {
-    return syscall2(SYS_KILL, pid, sig);
-}
-
-void * __brk(void * addr) {
-    return (void *)syscall1(SYS_BRK, (uint64_t)addr);
-}
-
 static char *curr_brk = NULL;
 
 int _brk(void *end_data_segment) {
@@ -108,12 +57,4 @@ pid_t _wait(int * status) {
 
 pid_t waitpid(pid_t pid, int * status, int options) {
     return syscall3(SYS_WAITPID, (uint64_t)pid, (uint64_t)status, (uint64_t)options);
-}
-
-uid_t getuid(void) {
-    return syscall0(SYS_GETUID);
-}
-
-uid_t getgid(void) {
-    return syscall0(SYS_GETGID);
 }
