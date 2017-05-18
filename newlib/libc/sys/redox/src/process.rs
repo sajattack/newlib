@@ -1,5 +1,5 @@
 use std::ffi::CStr;
-use libc::{c_char, c_int, c_void, size_t, pid_t, gid_t, uid_t};
+use libc::{c_char, c_int, c_void, size_t, pid_t, gid_t, uid_t, ptrdiff_t};
 use std::slice;
 use std::ptr::null;
 use syscall::error::{Error, EINVAL};
@@ -7,6 +7,7 @@ use syscall;
 use ::malloc;
 
 const MAXPATHLEN: usize = 1024;
+static mut CURR_BRK: usize = 0;
 
 libc_fn!(unsafe chdir(path: *const c_char) -> c_int {
     Ok(syscall::chdir(&CStr::from_ptr(path).to_string_lossy())? as c_int)
@@ -95,7 +96,62 @@ libc_fn!(unsafe _kill(pid: c_int, sig: c_int) -> c_int {
     Ok(syscall::kill(pid as usize, sig as usize)? as c_int)
 });
 
-libc_fn!(unsafe __brk(addr: *mut c_void) -> *mut c_void {
-    Ok(syscall::brk(addr as usize)? as *mut c_void)
+libc_fn!(unsafe _brk(end_data_segment: *mut c_void) -> c_int {
+    CURR_BRK = syscall::brk(end_data_segment as usize)?;
+    Ok(0)
+});
 
+libc_fn!(unsafe _sbrk(increment: ptrdiff_t) -> *mut c_void {
+    if CURR_BRK == 0 {
+        CURR_BRK = syscall::brk(0)?;
+    }
+    let old_brk = CURR_BRK;
+    CURR_BRK = syscall::brk(CURR_BRK + increment as usize)?;
+    Ok(old_brk as *mut c_void)
+});
+
+libc_fn!(unsafe _sched_yield() -> c_int {
+    Ok(syscall::sched_yield()? as c_int)
+});
+
+libc_fn!(unsafe _system(s: *const c_char) -> c_int {
+    match syscall::clone(0)? {
+        0 => {
+            let arg1 = "-c";
+            let args = [
+                [arg1.as_ptr() as usize, arg1.len()],
+                [s as usize, ::strlen(s)]
+            ];
+            syscall::execve("/bin/sh", &args)?;
+            syscall::exit(100)?;
+            unreachable!()
+        }
+        pid => {
+            let mut status = 0;
+            syscall::waitpid(pid, &mut status, 0)?;
+            Ok(status as c_int)
+        }
+    }
+});
+
+libc_fn!(unsafe setregid(rgid: gid_t, egid: gid_t) -> c_int {
+    Ok(syscall::setregid(rgid as usize, egid as usize)? as c_int)
+});
+
+libc_fn!(unsafe setreuid(ruid: uid_t, euid: uid_t) -> c_int {
+    Ok(syscall::setregid(ruid as usize, euid as usize)? as c_int)
+});
+
+libc_fn!(unsafe _wait(status: *mut c_int) -> c_int {
+    let mut buf = 0;
+    let res = syscall::waitpid(0, &mut buf, 0)?;
+    *status = buf as c_int;
+    Ok(res as c_int)
+});
+
+libc_fn!(unsafe waitpid(pid: pid_t, status: *mut c_int, options: c_int) -> c_int {
+    let mut buf = 0;
+    let res = syscall::waitpid(pid as usize, &mut buf, options as usize)?;
+    *status = buf as c_int;
+    Ok(res as c_int)
 });
