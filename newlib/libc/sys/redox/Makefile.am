@@ -4,18 +4,10 @@ AM_CCASFLAGS = $(INCLUDES)
 
 noinst_LIBRARIES = lib.a
 
-if MAY_SUPPLY_SYSCALLS
-extra_objs = \
-    common.o \
-    folder.o
-else
 extra_objs =
-endif
 
 lib_a_LIBADD = $(extra_objs)
 lib_a_SOURCES = \
-    common.c \
-    folder.c \
     crt0.c
 lib_a_DEPENDENCIES = $(extra_objs)
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)

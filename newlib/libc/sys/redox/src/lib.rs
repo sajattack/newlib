@@ -7,6 +7,7 @@ use libc::{c_int, c_void, c_char, size_t};
 mod macros;
 pub mod process;
 pub mod file;
+pub mod folder;
 pub mod time;
 pub mod unimpl;
 
