@@ -81,7 +81,7 @@ libc_fn!(unsafe rmdir(path: *mut c_char) -> c_int {
     Ok(syscall::rmdir(&path)? as c_int)
 });
 
-libc_fn!(unsafe _stat(path: *mut c_char, st: *mut syscall::Stat) -> c_int {
+libc_fn!(unsafe _stat(path: *const c_char, st: *mut syscall::Stat) -> c_int {
     let path = CStr::from_ptr(path).to_string_lossy();
     let fd = syscall::open(&path, O_CLOEXEC | O_STAT)?;
     let ret = _fstat(fd as c_int, st);

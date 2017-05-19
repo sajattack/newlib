@@ -8,6 +8,7 @@ mod macros;
 pub mod process;
 pub mod file;
 pub mod time;
+pub mod unimpl;
 
 extern {
     pub static mut errno: c_int;
