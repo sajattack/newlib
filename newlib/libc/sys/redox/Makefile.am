@@ -4,12 +4,10 @@ AM_CCASFLAGS = $(INCLUDES)
 
 noinst_LIBRARIES = lib.a
 
-extra_objs =
-
-lib_a_LIBADD = $(extra_objs)
+lib_a_LIBADD =
 lib_a_SOURCES = \
     crt0.c
-lib_a_DEPENDENCIES = $(extra_objs)
+lib_a_DEPENDENCIES =
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 
@@ -25,14 +23,8 @@ $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a: Cargo.toml $(ru
 	cd $(srcdir); CC=x86_64-elf-redox-gcc xargo build --target x86_64-unknown-redox --release
 
 # Modified from sys/phoenix
-lib.a: $(extra_objs) $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a
-	rm -f $@
-	rm -rf tmp
-	mkdir tmp
-	cd tmp; ar x $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a
-	$(AR) $(AR_FLAGS) $@ tmp/*.o $(extra_objs)
-	$(RANLIB) $@
-	rm -rf tmp
+lib.a: $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a
+	cp $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a lib.a
 
 if MAY_SUPPLY_SYSCALLS
 all: crt0.o
