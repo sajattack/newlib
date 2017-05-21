@@ -15,14 +15,14 @@ pub struct DIR {
     pub dd_ent: dirent,
 }
 
-libc_fn!(unsafe opendir(path: *mut c_char) -> *mut DIR {
+libc_fn!(unsafe opendir(path: *mut c_char) -> Result<*mut DIR> {
     let path = CStr::from_ptr(path).to_string_lossy();
     let fd = syscall::open(&path, O_RDONLY | O_CLOEXEC | O_DIRECTORY)?;
     let dir = Box::new(DIR{dd_fd: fd as c_int, dd_ent: dirent{d_name: [0; 4096]}});
     Ok(Box::into_raw(dir))
 });
 
-libc_fn!(unsafe readdir(dir: *mut DIR) -> *const dirent {
+libc_fn!(unsafe readdir(dir: *mut DIR) -> Result<*const dirent> {
     if !dir.is_null() {
         // TODO: Speed improvements
         let mut i = 0;
@@ -52,7 +52,7 @@ libc_fn!(unsafe rewinddir(dir: *const DIR) {
     }
 });
 
-libc_fn!(unsafe closedir(dir: *mut DIR) -> c_int {
+libc_fn!(unsafe closedir(dir: *mut DIR) -> Result<c_int> {
     let ret = syscall::close((*dir).dd_fd as usize);
     Box::from_raw(dir);
     ret?;

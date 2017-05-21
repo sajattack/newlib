@@ -8,11 +8,11 @@ pub struct TimeVal {
     pub tv_usec: c_long,
 }
 
-libc_fn!(unsafe clock_gettime(clk_id: c_int, tp: *mut TimeSpec) -> c_int {
+libc_fn!(unsafe clock_gettime(clk_id: c_int, tp: *mut TimeSpec) -> Result<c_int> {
     Ok(syscall::clock_gettime(clk_id as usize, &mut *tp)? as c_int)
 });
 
-libc_fn!(unsafe _gettimeofday(tv: *mut TimeVal, _tz: *const c_void) -> c_int {
+libc_fn!(unsafe _gettimeofday(tv: *mut TimeVal, _tz: *const c_void) -> Result<c_int> {
     if !tv.is_null() {
         let mut tp = TimeSpec::default();
         syscall::clock_gettime(syscall::flag::CLOCK_REALTIME, &mut tp)?;
@@ -24,6 +24,6 @@ libc_fn!(unsafe _gettimeofday(tv: *mut TimeVal, _tz: *const c_void) -> c_int {
     }
 });
 
-libc_fn!(unsafe nanosleep(req: *const TimeSpec, rem: *mut TimeSpec) -> c_int {
+libc_fn!(unsafe nanosleep(req: *const TimeSpec, rem: *mut TimeSpec) -> Result<c_int> {
     Ok(syscall::nanosleep(&*req, &mut *rem)? as c_int)
 });
