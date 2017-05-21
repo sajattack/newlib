@@ -4,10 +4,12 @@ use std::ptr::null;
 use std::ffi::CStr;
 use std::slice;
 
+#[repr(C)]
 pub struct dirent {
     pub d_name: [c_char; 4096],
 }
 
+#[repr(C)]
 pub struct DIR {
     pub dd_fd: c_int, /* directory file */
     pub dd_ent: dirent,
