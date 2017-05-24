@@ -95,13 +95,21 @@ libc_fn!(unsafe _brk(end_data_segment: *mut c_void) -> Result<c_int> {
     Ok(0)
 });
 
-libc_fn!(unsafe _sbrk(increment: ptrdiff_t) -> Result<*mut c_void> {
+libc_fn!(unsafe _sbrk(increment: ptrdiff_t) -> *mut c_void {
     if CURR_BRK == 0 {
-        CURR_BRK = syscall::brk(0)?;
+        CURR_BRK = syscall::brk(0).unwrap();
     }
     let old_brk = CURR_BRK;
-    CURR_BRK = syscall::brk(CURR_BRK + increment as usize)?;
-    Ok(old_brk as *mut c_void)
+    if increment != 0 {
+        CURR_BRK = match syscall::brk(old_brk + increment as usize) {
+            Ok(x) => x,
+            Err(err) => {
+                ::errno = err.errno;
+                return -1 as isize as *mut c_void;
+            }
+        }
+    }
+    old_brk as *mut c_void
 });
 
 libc_fn!(unsafe _sched_yield() -> Result<c_int> {
