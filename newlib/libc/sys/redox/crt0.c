@@ -29,7 +29,7 @@ void _start_stack(uint64_t * stack) {
     int argc = (int)(stack[0]);
     struct slice * rust_argv = (struct slice *)(&stack[1]);
 
-    char ** argv = calloc(argc, sizeof(char *));
+    char ** argv = calloc(argc + 1, sizeof(char *));
     int i;
     for(i = 0; i < argc; i++){
         struct slice rust_arg = rust_argv[i];
