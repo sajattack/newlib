@@ -101,7 +101,12 @@ libc_fn!(unsafe _sbrk(increment: ptrdiff_t) -> *mut c_void {
     }
     let old_brk = CURR_BRK;
     if increment != 0 {
-        CURR_BRK = match syscall::brk(old_brk + increment as usize) {
+        let addr = if increment >= 0 {
+            old_brk + increment as usize
+        } else {
+            old_brk - (-increment) as usize
+        };
+        CURR_BRK = match syscall::brk(addr) {
             Ok(x) => x,
             Err(err) => {
                 ::errno = err.errno;
