@@ -73,10 +73,10 @@ macro_rules! libc_fn {
         #[no_mangle]
         pub extern "C" fn $name($($aname: $atype,)*) -> $rtype {
             #[inline(always)]
-            fn internal($($aname: $atype,)*) -> ::syscall::Result<$rtype> {
+            fn inner($($aname: $atype,)*) -> ::syscall::Result<$rtype> {
                 $content
             }
-            unsafe { try_call!(internal($($aname,)*)) }
+            unsafe { try_call!(inner($($aname,)*)) }
         }
     };
     // Call with `unsafe` keyword (and arguments, return value)
@@ -84,10 +84,10 @@ macro_rules! libc_fn {
         #[no_mangle]
         pub unsafe extern "C" fn $name($($aname: $atype,)*) -> $rtype {
             #[inline(always)]
-            unsafe fn internal($($aname: $atype,)*) -> ::syscall::Result<$rtype> {
+            unsafe fn inner($($aname: $atype,)*) -> ::syscall::Result<$rtype> {
                 $content
             }
-            try_call!(internal($($aname,)*))
+            try_call!(inner($($aname,)*))
         }
     };
     // The next 2 cases handle non-Result return values
