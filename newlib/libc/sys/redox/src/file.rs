@@ -59,16 +59,16 @@ libc_fn!(unsafe _open(path: *mut c_char, flags: c_int, mode: mode_t) -> Result<c
     Ok(syscall::open(&path, flags as usize | (mode as usize & 0o777))? as c_int)
 });
 
-libc_fn!(unsafe pipe(pipefd: &mut [c_int; 2]) -> Result<c_int> {
-    Ok(pipe2(pipefd, 0))
+libc_fn!(unsafe pipe(pipefd: *mut [c_int; 2]) -> c_int {
+    pipe2(pipefd, 0)
 });
 
-libc_fn!(unsafe pipe2(pipefd: &mut [c_int; 2], flags: c_int) -> Result<c_int> {
-    let mut syspipefd = [pipefd[0] as usize, pipefd[1] as usize];
-    let ret = syscall::pipe2(&mut syspipefd, flags as usize)?;
-    pipefd[0] = syspipefd[0] as c_int;
-    pipefd[1] = syspipefd[1] as c_int;
-    Ok(ret as c_int)
+libc_fn!(unsafe pipe2(pipefd: *mut [c_int; 2], flags: c_int) -> Result<c_int> {
+    let mut syspipefd = [(*pipefd)[0] as usize, (*pipefd)[1] as usize];
+    syscall::pipe2(&mut syspipefd, flags as usize)?;
+    (*pipefd)[0] = syspipefd[0] as c_int;
+    (*pipefd)[1] = syspipefd[1] as c_int;
+    Ok(0)
 });
 
 libc_fn!(unsafe _read(file: c_int, buf: *mut c_char, len: c_int) -> Result<c_int> {
