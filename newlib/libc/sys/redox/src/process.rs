@@ -13,8 +13,8 @@ libc_fn!(unsafe chdir(path: *const c_char) -> Result<c_int> {
     Ok(syscall::chdir(&CStr::from_ptr(path).to_string_lossy())? as c_int)
 });
 
-libc_fn!(unsafe _exit(code: c_int) -> Result<c_int> {
-    Ok(syscall::exit(code as usize)? as c_int)
+libc_fn!(_exit(code: c_int) {
+    syscall::exit(code as usize).unwrap();
 });
 
 libc_fn!(unsafe _execve(name: *const c_char, argv: *const *const c_char, _env: *const *const c_char) -> Result<c_int> {
