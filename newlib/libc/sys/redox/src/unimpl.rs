@@ -96,3 +96,7 @@ libc_fn!(utime(_filename: *const c_char, _times: *mut c_void) -> Result<c_int> {
 libc_fn!(unsafe vfork() -> c_int {
     ::process::_fork()
 });
+
+libc_fn!(_isatty(file: c_int) -> c_int {
+    (file == 0 || file == 1 || file == 2) as c_int
+});
