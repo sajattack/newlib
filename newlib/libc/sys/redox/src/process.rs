@@ -109,7 +109,7 @@ libc_fn!(unsafe _sbrk(increment: ptrdiff_t) -> *mut c_void {
         CURR_BRK = match syscall::brk(addr) {
             Ok(x) => x,
             Err(err) => {
-                ::errno = err.errno;
+                *::__errno() = err.errno;
                 return -1 as isize as *mut c_void;
             }
         }

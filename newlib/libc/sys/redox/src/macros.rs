@@ -43,7 +43,7 @@ macro_rules! try_call {
         match $res {
             Ok(val) => val,
             Err(err) => {
-                ::errno = err.errno;
+                *::__errno() = err.errno;
                 return ::macros::Fail.into();
             }
         }
