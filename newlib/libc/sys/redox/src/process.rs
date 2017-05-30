@@ -10,7 +10,7 @@ const MAXPATHLEN: usize = 1024;
 static mut CURR_BRK: usize = 0;
 
 libc_fn!(unsafe chdir(path: *const c_char) -> Result<c_int> {
-    Ok(syscall::chdir(&CStr::from_ptr(path).to_string_lossy())? as c_int)
+    Ok(syscall::chdir(CStr::from_ptr(path).to_bytes())? as c_int)
 });
 
 libc_fn!(_exit(code: c_int) {
@@ -27,7 +27,7 @@ libc_fn!(unsafe _execve(name: *const c_char, argv: *const *const c_char, _env: *
         arg = arg.offset(1);
     }
 
-    let name = CStr::from_ptr(name).to_string_lossy();
+    let name = CStr::from_ptr(name).to_bytes();
 
     Ok(syscall::execve(&name, &args)? as c_int)
 });

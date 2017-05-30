@@ -16,8 +16,8 @@ pub struct DIR {
 }
 
 libc_fn!(unsafe opendir(path: *mut c_char) -> Result<*mut DIR> {
-    let path = CStr::from_ptr(path).to_string_lossy();
-    let fd = syscall::open(&path, O_RDONLY | O_CLOEXEC | O_DIRECTORY)?;
+    let path = CStr::from_ptr(path).to_bytes();
+    let fd = syscall::open(path, O_RDONLY | O_CLOEXEC | O_DIRECTORY)?;
     let dir = Box::new(DIR{dd_fd: fd as c_int, dd_ent: dirent{d_name: [0; 4096]}});
     Ok(Box::into_raw(dir))
 });
