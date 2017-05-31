@@ -4,8 +4,7 @@
 
 extern char ** environ;
 extern int main(int argc, char ** argv);
-
-void *__dso_handle = NULL;
+void __libc_init_array(void);
 
 __attribute__((naked)) void _start() {
     asm volatile(
@@ -37,5 +36,6 @@ void _start_stack(uint64_t * stack) {
         memcpy(arg, rust_arg.ptr, rust_arg.len);
         argv[i] = arg;
     }
+    __libc_init_array();
     exit(main(argc, argv));
 }

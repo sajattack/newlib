@@ -16,6 +16,7 @@ extern {
     pub fn __errno() -> *mut c_int;
     pub fn malloc(size: size_t) -> *mut c_void;
     pub fn strlen(s: *const c_char) -> size_t;
+    pub fn __libc_fini_array();
 }
 
 #[no_mangle]
