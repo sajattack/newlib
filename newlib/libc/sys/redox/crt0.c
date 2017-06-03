@@ -4,8 +4,7 @@
 
 extern char ** environ;
 extern int main(int argc, char ** argv);
-
-void *__dso_handle = NULL;
+void __libc_init_array(void);
 
 __attribute__((naked)) void _start() {
     asm volatile(
@@ -29,7 +28,7 @@ void _start_stack(uint64_t * stack) {
     int argc = (int)(stack[0]);
     struct slice * rust_argv = (struct slice *)(&stack[1]);
 
-    char ** argv = calloc(argc, sizeof(char *));
+    char ** argv = calloc(argc + 1, sizeof(char *));
     int i;
     for(i = 0; i < argc; i++){
         struct slice rust_arg = rust_argv[i];
@@ -37,5 +36,6 @@ void _start_stack(uint64_t * stack) {
         memcpy(arg, rust_arg.ptr, rust_arg.len);
         argv[i] = arg;
     }
+    __libc_init_array();
     exit(main(argc, argv));
 }
