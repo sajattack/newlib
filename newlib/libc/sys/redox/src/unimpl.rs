@@ -74,6 +74,7 @@ libc_fn!(_link(_old: *const c_char, _new: *const c_char) -> Result<c_int> {
     UNIMPL!(_link, EPERM)
 });
 
+/*
 libc_fn!(sysconf(_name: c_int) -> Result<c_long> {
     UNIMPL!(sysconf, EINVAL)
 });
@@ -82,6 +83,7 @@ libc_fn!(sysconf(_name: c_int) -> Result<c_long> {
 libc_fn!(_times(_buf: *mut c_void) -> Result<clock_t> {
     UNIMPL!(_times, EINVAL)
 });
+*/
 
 libc_fn!(umask(_mode: mode_t) -> mode_t {
     // All permissions granted

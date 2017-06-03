@@ -208,7 +208,7 @@ void	_EXFUN(setusershell, (void));
 #endif
 unsigned _EXFUN(sleep, (unsigned int __seconds ));
 void    _EXFUN(swab, (const void *__restrict, void *__restrict, ssize_t));
-long    _EXFUN(sysconf, (int __name ));
+//long    _EXFUN(sysconf, (int __name ));
 pid_t   _EXFUN(tcgetpgrp, (int __fildes ));
 int     _EXFUN(tcsetpgrp, (int __fildes, pid_t __pgrp_id ));
 char *  _EXFUN(ttyname, (int __fildes ));
@@ -305,6 +305,7 @@ int	_EXFUN(unlinkat, (int, const char *, int));
  *  sysconf values per IEEE Std 1003.1, 2008 Edition
  */
 
+#if 0
 #define _SC_ARG_MAX                       0
 #define _SC_CHILD_MAX                     1
 #define _SC_CLK_TCK                       2
@@ -460,6 +461,7 @@ int	_EXFUN(unlinkat, (int, const char *, int));
 #define _SC_LEVEL4_CACHE_ASSOC          138
 #define _SC_LEVEL4_CACHE_LINESIZE       139
 #define _SC_POSIX_26_VERSION            140
+#endif
 
 /*
  *  pathconf values per IEEE Std 1003.1, 2008 Edition
