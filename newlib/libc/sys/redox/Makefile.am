@@ -20,7 +20,7 @@ rust_sources = \
     src/unimpl.rs
 
 $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a: Cargo.toml $(rust_sources)
-	cd $(srcdir); CC=x86_64-elf-redox-gcc xargo build --target x86_64-unknown-redox --release
+	cd $(srcdir); CC=x86_64-elf-redox-gcc CFLAGS="$(CFLAGS) -I $(srcdir)/../../include" xargo build --target x86_64-unknown-redox --release
 
 lib.a: $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a
 	cp $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a lib.a
