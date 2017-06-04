@@ -3,7 +3,7 @@
 #include <string.h>
 
 extern char ** environ;
-extern int main(int argc, char ** argv);
+extern int main(int argc, char ** argv, char ** envp);
 void __libc_init_array(void);
 void initialize_standard_library(void);
 
@@ -39,5 +39,5 @@ void _start_stack(uint64_t * stack) {
     }
     initialize_standard_library();
     __libc_init_array();
-    exit(main(argc, argv));
+    exit(main(argc, argv, environ));
 }
