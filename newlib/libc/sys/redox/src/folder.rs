@@ -1,8 +1,8 @@
-use libc::{c_int, c_char};
+use ::{c_int, c_char};
 use syscall::{self, O_CLOEXEC, O_RDONLY, O_DIRECTORY};
-use std::ptr::null;
-use std::ffi::CStr;
-use std::slice;
+use core::ptr::null;
+use core::slice;
+use collections::boxed::Box;
 
 #[repr(C)]
 pub struct dirent {
@@ -16,7 +16,7 @@ pub struct DIR {
 }
 
 libc_fn!(unsafe opendir(path: *mut c_char) -> Result<*mut DIR> {
-    let path = CStr::from_ptr(path).to_bytes();
+    let path = ::cstr_to_slice(path);
     let fd = syscall::open(path, O_RDONLY | O_CLOEXEC | O_DIRECTORY)?;
     let dir = Box::new(DIR{dd_fd: fd as c_int, dd_ent: dirent{d_name: [0; 4096]}});
     Ok(Box::into_raw(dir))

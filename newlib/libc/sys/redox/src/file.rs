@@ -1,13 +1,11 @@
 use syscall::{self, O_CLOEXEC, O_STAT, O_CREAT, O_EXCL, O_DIRECTORY};
-use std::slice;
-use std::ffi::CStr;
-use libc::{c_int, c_char, off_t, mode_t};
+use core::slice;
+use ::{c_int, c_char, off_t, mode_t};
 
 
 libc_fn!(unsafe access(path: *mut c_char, _amode: c_int) -> Result<c_int> {
     // XXX amode
-    let path = CStr::from_ptr(path).to_bytes();
-    let fd = syscall::open(path, O_CLOEXEC | O_STAT)?;
+    let fd = syscall::open(::cstr_to_slice(path), O_CLOEXEC | O_STAT)?;
     syscall::close(fd)?;
     Ok(0)
 });
@@ -47,15 +45,14 @@ libc_fn!(unsafe _lseek(file: c_int, ptr: c_int, dir: c_int) -> Result<c_int> {
 
 
 libc_fn!(unsafe mkdir(path: *mut c_char, mode: mode_t) -> Result<c_int> {
-    let path = CStr::from_ptr(path).to_bytes();
     let flags = O_CREAT | O_EXCL | O_CLOEXEC | O_DIRECTORY | (mode as usize & 0o777);
-    let fd = syscall::open(path, flags)?;
+    let fd = syscall::open(::cstr_to_slice(path), flags)?;
     syscall::close(fd)?;
     Ok(0)
 });
 
 libc_fn!(unsafe _open(path: *mut c_char, flags: c_int, mode: mode_t) -> Result<c_int> {
-    let path = CStr::from_ptr(path).to_bytes();
+    let path = ::cstr_to_slice(path);
     Ok(syscall::open(path, flags as usize | (mode as usize & 0o777))? as c_int)
 });
 
@@ -77,21 +74,18 @@ libc_fn!(unsafe _read(file: c_int, buf: *mut c_char, len: c_int) -> Result<c_int
 });
 
 libc_fn!(unsafe rmdir(path: *mut c_char) -> Result<c_int> {
-    let path = CStr::from_ptr(path).to_bytes();
-    Ok(syscall::rmdir(path)? as c_int)
+    Ok(syscall::rmdir(::cstr_to_slice(path))? as c_int)
 });
 
 libc_fn!(unsafe _stat(path: *const c_char, st: *mut syscall::Stat) -> Result<c_int> {
-    let path = CStr::from_ptr(path).to_bytes();
-    let fd = syscall::open(path, O_CLOEXEC | O_STAT)?;
+    let fd = syscall::open(::cstr_to_slice(path), O_CLOEXEC | O_STAT)?;
     let ret = _fstat(fd as c_int, st);
     let _ = syscall::close(fd);
     Ok(ret)
 });
 
 libc_fn!(unsafe _unlink(path: *mut c_char) -> Result<c_int> {
-    let path = CStr::from_ptr(path).to_bytes();
-    Ok(syscall::unlink(path)? as c_int)
+    Ok(syscall::unlink(::cstr_to_slice(path))? as c_int)
 });
 
 libc_fn!(unsafe _write(file: c_int, buf: *const c_char, len: c_int) -> Result<c_int> {
@@ -100,6 +94,5 @@ libc_fn!(unsafe _write(file: c_int, buf: *const c_char, len: c_int) -> Result<c_
 });
 
 libc_fn!(unsafe chmod(path: *mut c_char, mode: mode_t) -> Result<c_int> {
-    let path = CStr::from_ptr(path).to_bytes();
-    Ok(syscall::chmod(path, mode as usize)? as c_int)
+    Ok(syscall::chmod(::cstr_to_slice(path), mode as usize)? as c_int)
 });

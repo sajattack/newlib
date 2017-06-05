@@ -1,8 +1,7 @@
 use syscall;
-use std::io::{stderr, Write};
-use libc::{c_uint, c_int, c_char, gid_t, uid_t, c_void, c_long, mode_t};
+use ::{c_uint, c_int, c_char, gid_t, uid_t, c_void, c_long, mode_t};
 use syscall::error::{Error, EACCES, EPERM, EINVAL};
-use std::ptr::null;
+use core::ptr::null;
 
 #[allow(non_camel_case_types)]
 type clock_t = c_long;
@@ -11,14 +10,14 @@ macro_rules! UNIMPL {
     // Call with arguments and return value
     ($func:ident, $err:ident) => {{
          let err = Error::new($err);
-         writeln!(stderr(), "unimplemented: {}: {}",
-             stringify!($func), err).unwrap();
+         let _ = syscall::write(2, format!("unimplemented: {}: {}",
+             stringify!($func), err).as_bytes());
          Err(err)
     }};
 }
 
 libc_fn!(alarm(_seconds: c_uint) -> c_uint {
-    writeln!(stderr(), "unimplemented: alarm").unwrap();
+    let _ = syscall::write(2, "unimplemented: alarm".as_bytes());
     0
 });
 

@@ -1,7 +1,7 @@
-use std::ffi::CStr;
-use libc::{c_char, c_int, c_void, size_t, pid_t, gid_t, uid_t, ptrdiff_t};
-use std::slice;
-use std::ptr::null;
+use ::{c_char, c_int, c_void, size_t, pid_t, gid_t, uid_t, ptrdiff_t};
+use core::slice;
+use core::ptr::null;
+use collections::Vec;
 use syscall::error::{Error, EINVAL};
 use syscall;
 use ::malloc;
@@ -10,7 +10,7 @@ const MAXPATHLEN: usize = 1024;
 static mut CURR_BRK: usize = 0;
 
 libc_fn!(unsafe chdir(path: *const c_char) -> Result<c_int> {
-    Ok(syscall::chdir(CStr::from_ptr(path).to_bytes())? as c_int)
+    Ok(syscall::chdir(::cstr_to_slice(path))? as c_int)
 });
 
 libc_fn!(unsafe _exit(code: c_int) {
@@ -24,13 +24,11 @@ libc_fn!(unsafe _execve(name: *const c_char, argv: *const *const c_char, _env: *
     let mut args: Vec<[usize; 2]> = Vec::new();
     let mut arg = argv;
     while !(*arg).is_null() {
-        args.push([*arg as usize, CStr::from_ptr(*arg).to_bytes().len()]);
+        args.push([*arg as usize, ::strlen(*arg)]);
         arg = arg.offset(1);
     }
 
-    let name = CStr::from_ptr(name).to_bytes();
-
-    Ok(syscall::execve(&name, &args)? as c_int)
+    Ok(syscall::execve(::cstr_to_slice(name), &args)? as c_int)
 });
 
 libc_fn!(unsafe _fork() -> Result<c_int> {
