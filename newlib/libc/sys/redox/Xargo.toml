@@ -1,3 +1,7 @@
-[dependencies.std]
-features = ["panic_unwind"]
+[dependencies.core]
 
+[dependencies.collections]
+
+[dependencies.alloc_system]
+
+[dependencies.compiler_builtins]

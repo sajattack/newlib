@@ -1,5 +1,5 @@
-use std::ptr;
-use std::any::Any;
+use core::ptr;
+use core::any::Any;
 
 
 /// This struct converts to `NULL` for raw pointers, and `-1` for signed
