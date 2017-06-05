@@ -1,5 +1,5 @@
 #![no_std]
-#![feature(collections, lang_items, core_intrinsics, compiler_builtins_lib)]
+#![feature(collections, lang_items, core_intrinsics, compiler_builtins_lib, linkage)]
 #![allow(non_camel_case_types)]
 
 extern crate syscall;
@@ -91,6 +91,8 @@ pub unsafe extern "C" fn __errno_location() -> *mut c_int {
 }
 
 #[lang = "panic_fmt"]
+#[linkage = "weak"]
+#[no_mangle]
 pub extern fn rust_begin_panic(_msg: core::fmt::Arguments,
                                _file: &'static str,
                                _line: u32) -> ! {
