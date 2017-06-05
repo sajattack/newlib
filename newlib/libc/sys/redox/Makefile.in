@@ -68,9 +68,7 @@ CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
-@MAY_SUPPLY_SYSCALLS_TRUE@am__DEPENDENCIES_1 = common.o file.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@	folder.o process.o time.o unimpl.o
-am_lib_a_OBJECTS =
+am_lib_a_OBJECTS = lib_a-crt0.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
@@ -79,7 +77,7 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(lib_a_SOURCES) $(EXTRA_lib_a_SOURCES)
+SOURCES = $(lib_a_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -195,29 +193,21 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
-@MAY_SUPPLY_SYSCALLS_FALSE@extra_objs = 
-@MAY_SUPPLY_SYSCALLS_TRUE@extra_objs = \
-@MAY_SUPPLY_SYSCALLS_TRUE@    common.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@    file.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@    folder.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@    process.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@    time.o \
-@MAY_SUPPLY_SYSCALLS_TRUE@    unimpl.o
-
-lib_a_SOURCES = 
-lib_a_LIBADD = $(extra_objs)
-EXTRA_lib_a_SOURCES = \
-    common.c \
-    file.c \
-    folder.c \
-    process.c \
-    time.c \
-    unimpl.c \
+lib_a_LIBADD = 
+lib_a_SOURCES = \
     crt0.c
 
-lib_a_DEPENDENCIES = $(extra_objs)
+lib_a_DEPENDENCIES = 
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
+rust_sources = \
+    src/lib.rs \
+    src/macros.rs \
+    src/process.rs \
+    src/file.rs \
+    src/time.rs \
+    src/unimpl.rs
+
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 
@@ -272,10 +262,6 @@ $(am__aclocal_m4_deps):
 
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES) $(EXTRA_lib_a_DEPENDENCIES) 
-	-rm -f lib.a
-	$(lib_a_AR) lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
-	$(RANLIB) lib.a
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -288,42 +274,6 @@ distclean-compile:
 
 .c.obj:
 	$(COMPILE) -c `$(CYGPATH_W) '$<'`
-
-lib_a-common.o: common.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-common.o `test -f 'common.c' || echo '$(srcdir)/'`common.c
-
-lib_a-common.obj: common.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-common.obj `if test -f 'common.c'; then $(CYGPATH_W) 'common.c'; else $(CYGPATH_W) '$(srcdir)/common.c'; fi`
-
-lib_a-file.o: file.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-file.o `test -f 'file.c' || echo '$(srcdir)/'`file.c
-
-lib_a-file.obj: file.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-file.obj `if test -f 'file.c'; then $(CYGPATH_W) 'file.c'; else $(CYGPATH_W) '$(srcdir)/file.c'; fi`
-
-lib_a-folder.o: folder.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-folder.o `test -f 'folder.c' || echo '$(srcdir)/'`folder.c
-
-lib_a-folder.obj: folder.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-folder.obj `if test -f 'folder.c'; then $(CYGPATH_W) 'folder.c'; else $(CYGPATH_W) '$(srcdir)/folder.c'; fi`
-
-lib_a-process.o: process.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-process.o `test -f 'process.c' || echo '$(srcdir)/'`process.c
-
-lib_a-process.obj: process.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-process.obj `if test -f 'process.c'; then $(CYGPATH_W) 'process.c'; else $(CYGPATH_W) '$(srcdir)/process.c'; fi`
-
-lib_a-time.o: time.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-time.o `test -f 'time.c' || echo '$(srcdir)/'`time.c
-
-lib_a-time.obj: time.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-time.obj `if test -f 'time.c'; then $(CYGPATH_W) 'time.c'; else $(CYGPATH_W) '$(srcdir)/time.c'; fi`
-
-lib_a-unimpl.o: unimpl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-unimpl.o `test -f 'unimpl.c' || echo '$(srcdir)/'`unimpl.c
-
-lib_a-unimpl.obj: unimpl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-unimpl.obj `if test -f 'unimpl.c'; then $(CYGPATH_W) 'unimpl.c'; else $(CYGPATH_W) '$(srcdir)/unimpl.c'; fi`
 
 lib_a-crt0.o: crt0.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-crt0.o `test -f 'crt0.c' || echo '$(srcdir)/'`crt0.c
@@ -502,6 +452,12 @@ uninstall-am:
 	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
 	uninstall-am
 
+
+$(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a: Cargo.toml $(rust_sources)
+	cd $(srcdir); CC=x86_64-elf-redox-gcc CFLAGS="$(CFLAGS) -I $(srcdir)/../../include" xargo build --target x86_64-unknown-redox --release
+
+lib.a: $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a
+	cp $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a lib.a
 
 @MAY_SUPPLY_SYSCALLS_TRUE@all: crt0.o
 objectlist.awk.in: $(noinst_LTLIBRARIES)
