@@ -1,5 +1,5 @@
 use syscall;
-use ::{c_uint, c_int, c_char, gid_t, uid_t, c_void, c_long, mode_t};
+use ::types::{c_uint, c_int, c_char, gid_t, uid_t, c_void, c_long, mode_t};
 use syscall::error::{Error, EACCES, EPERM, EINVAL};
 use core::ptr::null;
 

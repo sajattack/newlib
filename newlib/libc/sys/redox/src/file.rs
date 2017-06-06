@@ -1,6 +1,6 @@
 use syscall::{self, O_CLOEXEC, O_STAT, O_CREAT, O_EXCL, O_DIRECTORY};
 use core::slice;
-use ::{c_int, c_char, off_t, mode_t};
+use ::types::{c_int, c_char, off_t, mode_t};
 
 
 libc_fn!(unsafe access(path: *mut c_char, _amode: c_int) -> Result<c_int> {
