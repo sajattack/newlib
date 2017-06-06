@@ -77,12 +77,12 @@ libc_fn!(_link(_old: *const c_char, _new: *const c_char) -> Result<c_int> {
 libc_fn!(sysconf(_name: c_int) -> Result<c_long> {
     UNIMPL!(sysconf, EINVAL)
 });
+*/
 
 // XXX type of argument pointer
 libc_fn!(_times(_buf: *mut c_void) -> Result<clock_t> {
     UNIMPL!(_times, EINVAL)
 });
-*/
 
 libc_fn!(umask(_mode: mode_t) -> mode_t {
     // All permissions granted
