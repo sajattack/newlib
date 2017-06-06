@@ -10,14 +10,14 @@ macro_rules! UNIMPL {
     // Call with arguments and return value
     ($func:ident, $err:ident) => {{
          let err = Error::new($err);
-         let _ = syscall::write(2, format!("unimplemented: {}: {}",
+         let _ = syscall::write(2, format!("unimplemented: {}: {}\n",
              stringify!($func), err).as_bytes());
          Err(err)
     }};
 }
 
 libc_fn!(alarm(_seconds: c_uint) -> c_uint {
-    let _ = syscall::write(2, "unimplemented: alarm".as_bytes());
+    let _ = syscall::write(2, "unimplemented: alarm\n".as_bytes());
     0
 });
 
