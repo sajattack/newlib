@@ -1,4 +1,4 @@
-use ::{c_char, c_int, c_void, size_t, pid_t, gid_t, uid_t, ptrdiff_t};
+use ::types::{c_char, c_int, c_void, size_t, pid_t, gid_t, uid_t, ptrdiff_t};
 use core::slice;
 use core::ptr::null;
 use collections::Vec;
