@@ -17,6 +17,7 @@ pub mod file;
 pub mod folder;
 pub mod time;
 pub mod unimpl;
+pub mod redox;
 mod types;
 
 extern {

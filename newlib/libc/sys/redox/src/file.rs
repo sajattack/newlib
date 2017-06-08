@@ -22,11 +22,6 @@ libc_fn!(unsafe dup2(file: c_int, newfile: c_int) -> Result<c_int> {
     Ok(syscall::dup2(file as usize, newfile as usize, &[])? as c_int)
 });
 
-libc_fn!(unsafe _fpath(file: c_int, buf: *mut c_char, len: c_int) -> Result<c_int> {
-    let buf = slice::from_raw_parts_mut(buf as *mut u8, len as usize);
-    Ok(syscall::fpath(file as usize, buf)? as c_int)
-});
-
 libc_fn!(unsafe _fstat(file: c_int, st: *mut syscall::Stat) -> Result<c_int> {
     Ok(syscall::fstat(file as usize, &mut *st)? as c_int)
 });
