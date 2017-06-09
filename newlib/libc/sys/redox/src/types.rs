@@ -47,6 +47,6 @@ pub type wchar_t = i16;
 pub type off_t = usize;
 pub type mode_t = u16;
 pub type time_t = i64;
-pub type pid_t = usize;
+pub type pid_t = c_int;
 pub type gid_t = usize;
 pub type uid_t = usize;

@@ -157,6 +157,11 @@ libc_fn!(unsafe _wait(status: *mut c_int) -> Result<c_int> {
 
 libc_fn!(unsafe waitpid(pid: pid_t, status: *mut c_int, options: c_int) -> Result<c_int> {
     let mut buf = 0;
+    let pid = if pid == -1 {
+        0
+    } else {
+        pid as usize
+    };
     let res = syscall::waitpid(pid as usize, &mut buf, options as usize)?;
     *status = buf as c_int;
     Ok(res as c_int)
