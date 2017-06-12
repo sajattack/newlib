@@ -27,8 +27,8 @@ libc_fn!(unsafe redox_physfree(physical_address: *mut c_void, size: size_t) -> R
     Ok(syscall::physfree(physical_address as usize, size)? as c_int)
 });
 
-libc_fn!(unsafe redox_physmap(physical_address: *mut c_void, size: size_t, flags: c_int) -> Result<c_int> {
-    Ok(syscall::physmap(physical_address as usize, size, flags as usize)? as c_int)
+libc_fn!(unsafe redox_physmap(physical_address: *mut c_void, size: size_t, flags: c_int) -> Result<*mut c_void> {
+    Ok(syscall::physmap(physical_address as usize, size, flags as usize)? as *mut c_void)
 });
 
 libc_fn!(unsafe redox_physunmap(virtual_address: *mut c_void) -> Result<c_int> {
