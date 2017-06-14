@@ -6,5 +6,8 @@ version = "0.1.0"
 name = "newlib_redox"
 crate-type = ["staticlib"]
 
+[profile.release]
+lto = true
+
 [dependencies]
 redox_syscall = "0.1"

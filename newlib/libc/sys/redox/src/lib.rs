@@ -53,30 +53,31 @@ pub extern fn rust_begin_panic(_msg: core::fmt::Arguments,
 libc_fn!(unsafe initialize_standard_library() {
     let fd = syscall::open("env:", syscall::O_RDONLY).unwrap();
 
+    let mut st = syscall::Stat::default();
+    syscall::fstat(fd, &mut st).unwrap();
+    let size = st.st_size as usize;
+
     let mut vars = Vec::new();
 
-    // XXX optimize
-    let mut buf = [0; 1];
-    'outer: loop {
-        let mut line = Vec::new();
-        loop {
-            if syscall::read(fd, &mut buf).unwrap() == 0 {
-                break 'outer;
-            }
-            if buf[0] == '\n' as u8 {
-                break;
-            }
-            line.push(buf[0]);
+    let mut buf = Vec::with_capacity(size + 1);
+    buf.set_len(size + 1);
+    syscall::read(fd, buf.as_mut_slice()).unwrap();
 
+    vars.push(&mut buf[0] as *mut u8 as *mut c_char);
+    for i in 0..size {
+        if buf[i] == b'\n' {
+            if i != size - 1 {
+                vars.push(&mut buf[i + 1] as *mut u8 as *mut c_char);
+            }
+            buf[i] = b'\0';
         }
-        line.push(0); // Null terminate
-        vars.push(line.as_mut_ptr() as *mut c_char);
-        mem::forget(line); // Do not free memory
     }
+    buf[size] = b'\0';
     vars.push(ptr::null_mut());
 
     environ = vars.as_mut_ptr();
     mem::forget(vars); // Do not free memory
+    mem::forget(buf);
 
     syscall::close(fd).unwrap();
 });
