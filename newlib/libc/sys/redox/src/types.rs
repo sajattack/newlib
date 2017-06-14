@@ -1,4 +1,4 @@
-#![allow(non_camel_case_types)]
+#![allow(non_camel_case_types, dead_code)]
 
 // Copied from libc crate
 #[repr(u8)]
@@ -50,3 +50,29 @@ pub type time_t = i64;
 pub type pid_t = c_int;
 pub type gid_t = usize;
 pub type uid_t = usize;
+
+
+// Socket related types
+pub type in_addr_t = [u8; 4];
+pub type sa_family_t = u16;
+pub type socklen_t = size_t; 
+pub type in_port_t = [u8; 2];
+
+#[repr(C)]
+pub struct in_addr {
+    pub s_addr: in_addr_t
+}
+
+#[repr(C)]
+pub struct sockaddr {
+    pub sa_family: sa_family_t,
+    sa_data: [c_char; 14]
+}
+
+#[repr(C)]
+pub struct sockaddr_in {
+    pub sin_family: sa_family_t,
+    pub sin_port: in_port_t,
+    pub sin_addr: in_addr,
+    __pad: [u8; 8]
+}

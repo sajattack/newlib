@@ -1,10 +1,11 @@
 #![no_std]
-#![feature(collections, lang_items, core_intrinsics, compiler_builtins_lib, linkage)]
+#![feature(collections, lang_items, core_intrinsics, compiler_builtins_lib, linkage, drop_types_in_const)]
 
 extern crate syscall;
 #[macro_use]
 extern crate collections;
 extern crate compiler_builtins;
+extern crate byteorder;
 
 use core::{ptr, mem, intrinsics, slice};
 use collections::Vec;
@@ -18,6 +19,7 @@ pub mod folder;
 pub mod time;
 pub mod unimpl;
 pub mod redox;
+pub mod socket;
 mod types;
 
 extern {
