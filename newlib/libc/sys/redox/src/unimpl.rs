@@ -86,7 +86,7 @@ libc_fn!(_times(_buf: *mut c_void) -> Result<clock_t> {
 
 libc_fn!(umask(_mode: mode_t) -> mode_t {
     // All permissions granted
-    0o777
+    0o000
 });
 
 // XXX type of argument pointer
