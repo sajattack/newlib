@@ -1,5 +1,5 @@
 #![no_std]
-#![feature(collections, lang_items, core_intrinsics, compiler_builtins_lib, linkage, drop_types_in_const)]
+#![feature(collections, lang_items, core_intrinsics, compiler_builtins_lib, linkage, drop_types_in_const, const_fn)]
 
 extern crate syscall;
 #[macro_use]
@@ -13,6 +13,8 @@ use ::types::{c_int, c_void, c_char, size_t};
 
 #[macro_use]
 mod macros;
+mod types;
+mod dns;
 pub mod process;
 pub mod file;
 pub mod folder;
@@ -20,7 +22,7 @@ pub mod time;
 pub mod unimpl;
 pub mod redox;
 pub mod socket;
-mod types;
+pub mod hostname;
 
 extern {
     // Newlib uses this function instead of just a global to support reentrancy
@@ -38,6 +40,22 @@ pub unsafe fn cstr_to_slice_mut<'a>(buf: *const c_char) ->  &'a mut [u8] {
     slice::from_raw_parts_mut(buf as *mut u8, ::strlen(buf) as usize)
 }
 
+pub fn file_read_all<T: AsRef<[u8]>>(path: T) -> syscall::Result<Vec<u8>> {
+    let fd = syscall::open(path, syscall::O_RDONLY)?;
+
+    let mut st = syscall::Stat::default();
+    syscall::fstat(fd, &mut st)?;
+    let size = st.st_size as usize;
+
+    let mut buf = Vec::with_capacity(size);
+    unsafe { buf.set_len(size) };
+    syscall::read(fd, buf.as_mut_slice())?;
+
+    syscall::close(fd)?;
+
+    Ok(buf)
+}
+
 #[no_mangle]
 pub unsafe extern "C" fn __errno_location() -> *mut c_int {
     __errno()
@@ -53,17 +71,11 @@ pub extern fn rust_begin_panic(_msg: core::fmt::Arguments,
 }
 
 libc_fn!(unsafe initialize_standard_library() {
-    let fd = syscall::open("env:", syscall::O_RDONLY).unwrap();
-
-    let mut st = syscall::Stat::default();
-    syscall::fstat(fd, &mut st).unwrap();
-    let size = st.st_size as usize;
+    let mut buf = file_read_all("env:").unwrap();
+    let size = buf.len();
+    buf.set_len(size + 1);
 
     let mut vars = Vec::new();
-
-    let mut buf = Vec::with_capacity(size + 1);
-    buf.set_len(size + 1);
-    syscall::read(fd, buf.as_mut_slice()).unwrap();
 
     vars.push(&mut buf[0] as *mut u8 as *mut c_char);
     for i in 0..size {
@@ -80,6 +92,4 @@ libc_fn!(unsafe initialize_standard_library() {
     environ = vars.as_mut_ptr();
     mem::forget(vars); // Do not free memory
     mem::forget(buf);
-
-    syscall::close(fd).unwrap();
 });

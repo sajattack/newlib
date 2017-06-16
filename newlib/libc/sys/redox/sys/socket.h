@@ -24,7 +24,6 @@ struct sockaddr {
 int connect(int socket, const struct sockaddr *address, socklen_t address_len);
 ssize_t recv(int socket, void *buffer, size_t length, int flags);
 ssize_t send(int socket, const void *buffer, size_t length, int flags);
-struct hostent *gethostbyname(const char *name);
 int socket(int domain, int type, int protocol);
 int bind(int socket, const struct sockaddr *address, socklen_t address_len);
 int setsockopt(int socket, int level, int option_name, const void *option_value, socklen_t option_len);

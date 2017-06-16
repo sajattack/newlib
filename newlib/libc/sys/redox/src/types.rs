@@ -76,3 +76,12 @@ pub struct sockaddr_in {
     pub sin_addr: in_addr,
     __pad: [u8; 8]
 }
+
+#[repr(C)]
+pub struct hostent {
+    pub h_name: *const c_char,
+    pub h_aliases: *const *const c_char,
+    pub h_addrtype: c_int,
+    pub h_length: c_int,
+    pub h_addr_list: *const *const c_char
+}

@@ -17,9 +17,16 @@ rust_sources = \
     src/process.rs \
     src/file.rs \
     src/time.rs \
-    src/unimpl.rs
+    src/folder.rs \
+    src/unimpl.rs \
+    src/socket.rs \
+    src/types.rs \
+    src/hostname.rs \
+    src/dns/answer.rs \
+    src/dns/mod.rs \
+    src/dns/query.rs
 
-$(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a: Cargo.toml $(rust_sources)
+$(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a: Xargo.toml Cargo.toml $(rust_sources)
 	cd $(srcdir); CC=x86_64-elf-redox-gcc CFLAGS="$(CFLAGS) -I $(srcdir)/../../include" xargo build --target x86_64-unknown-redox --release
 
 lib.a: $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a
