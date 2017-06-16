@@ -53,7 +53,7 @@ fn lookup_host(host: &str) -> Result<LookupHost> {
 
         let packet_data = packet.compile();
 
-        let fd = syscall::open(format!("udp:{}.{}.{}.{}:0", 
+        let fd = syscall::open(format!("udp:{}.{}.{}.{}:0",
                                        ip[0], ip[1], ip[2], ip[3]).as_bytes(),
                                syscall::O_RDWR)?;
 
@@ -82,7 +82,7 @@ fn lookup_host(host: &str) -> Result<LookupHost> {
                     if answer.a_type == 0x0001 && answer.a_class == 0x0001
                        && answer.data.len() == 4
                     {
-                        let addr = in_addr{ 
+                        let addr = in_addr {
                             s_addr: [answer.data[0], answer.data[1], answer.data[2], answer.data[3]]
                         };
                         addrs.push(addr);
