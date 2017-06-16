@@ -33,3 +33,7 @@ ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 
 include $(srcdir)/../../../Makefile.shared
+
+install-data-local:
+	$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/arpa;
+	$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/netinet;
