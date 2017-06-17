@@ -1,7 +1,8 @@
 use core::str::{self, FromStr};
+use core::mem;
 use ::types::{c_int, c_char, size_t, c_void, ssize_t, socklen_t, in_addr, sockaddr, sockaddr_in};
-use syscall::{self, O_RDWR, O_WRONLY};
-use syscall::error::{Error, EPROTOTYPE, EPROTONOSUPPORT, EAFNOSUPPORT, EINVAL, EOPNOTSUPP};
+use syscall::{self, O_RDWR};
+use syscall::error::{Error, EPROTOTYPE, EPROTONOSUPPORT, EAFNOSUPPORT, EINVAL, EOPNOTSUPP, ENOBUFS};
 use core::slice;
 use collections::Vec;
 use byteorder::{BigEndian, ByteOrder};
@@ -111,6 +112,40 @@ libc_fn!(unsafe sendto(socket: c_int, message: *const c_void, length: size_t, fl
         Ok(ret)
     } else {
         Err(Error::new(EOPNOTSUPP))
+    }
+});
+
+libc_fn!(unsafe getpeername(socket: c_int, address: *mut sockaddr, address_len: *mut socklen_t) -> Result<c_int> {
+    // XXX will need to be changed for other sockaddr types
+    if *address_len < mem::size_of::<sockaddr_in>() {
+        return Err(Error::new(ENOBUFS));
+    }
+    *address_len = mem::size_of::<sockaddr_in>();
+    let addr = &mut *(address as *mut sockaddr_in);
+    addr.sin_family = AF_INET as u16;
+
+    let mut path = [0; 4096];
+    syscall::fpath(socket as usize, &mut path)?;
+    let start;
+    let sep;
+    let end;
+    {
+        let mut iter = path.iter();
+        start = iter.position(|x| *x == b':').ok_or(Error::new(EINVAL))? + 1;
+        sep = start + iter.position(|x| *x == b':').ok_or(Error::new(EINVAL))?;
+        end = sep + 1 + iter.position(|x| *x == b'/').ok_or(Error::new(EINVAL))?;
+    }
+    path[sep] = b'\0';
+
+    if inet_aton(&path[start] as *const u8 as *const c_char, &mut addr.sin_addr) == 1 {
+        if let Ok(port) = u16::from_str(str::from_utf8_unchecked(&path[sep+1..end])) {
+            addr.sin_port = htons(port);
+            Ok(0)
+        } else {
+            Err(Error::new(EINVAL))
+        }
+    } else {
+        Err(Error::new(EINVAL)) // ?
     }
 });
 
