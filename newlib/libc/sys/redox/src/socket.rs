@@ -71,6 +71,21 @@ libc_fn!(unsafe connect(socket: c_int, address: *const sockaddr, _address_len: s
     Ok(0)
 });
 
+libc_fn!(unsafe bind(socket: c_int, address: *const sockaddr, _address_len: socklen_t) -> Result<c_int> {
+    // XXX Check address_len
+    if (*address).sa_family as i32 != AF_INET {
+        return Err(Error::new(EINVAL))
+    };
+    let address = &*(address as *const sockaddr_in);
+    let s_addr =address.sin_addr.s_addr;
+    let path = format!("/{}.{}.{}.{}:{}", s_addr[0], s_addr[1], s_addr[2], s_addr[3], ntohs(address.sin_port));
+    let fd = syscall::dup(socket as usize, path.as_bytes())?;
+    let ret = syscall::dup2(fd, socket as usize, &vec![]);
+    let _ = syscall::close(fd);
+    ret?;
+    Ok(0)
+});
+
 libc_fn!(unsafe recv(socket: c_int, buffer: *mut c_void, length: size_t, flags: c_int) -> Result<ssize_t> {
     // XXX flags
     if flags != 0 {
