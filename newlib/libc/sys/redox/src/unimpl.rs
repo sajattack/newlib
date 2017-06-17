@@ -105,7 +105,7 @@ libc_fn!(_isatty(file: c_int) -> c_int {
 libc_fn!(unsafe select(nfds: c_int, readfds: *mut fd_set, writefds: *mut fd_set, errorfds: *mut fd_set, _timeout: *mut timeval) -> Result<c_int> {
     use ::types::{FD_SETSIZE, NFDBITS};
     let mut ret = 0;
-    syscall::write(2, b"unimplemented: select()").unwrap();
+    syscall::write(2, b"unimplemented: select()\n").unwrap();
     if !readfds.is_null() {
         for i in 0..FD_SETSIZE {
              if ((*readfds).fds_bits[i/NFDBITS] & (1 << (i % NFDBITS))) != 0 {
