@@ -1,4 +1,4 @@
-#![allow(non_camel_case_types)]
+#![allow(non_camel_case_types, dead_code)]
 
 // Copied from libc crate
 #[repr(u8)]
@@ -47,6 +47,59 @@ pub type wchar_t = i16;
 pub type off_t = usize;
 pub type mode_t = u16;
 pub type time_t = i64;
+pub type suseconds_t = c_long;
 pub type pid_t = c_int;
 pub type gid_t = usize;
 pub type uid_t = usize;
+
+
+// Socket related types
+pub type in_addr_t = [u8; 4];
+pub type sa_family_t = u16;
+pub type socklen_t = size_t; 
+pub type in_port_t = [u8; 2];
+
+#[repr(C)]
+pub struct in_addr {
+    pub s_addr: in_addr_t
+}
+
+#[repr(C)]
+pub struct sockaddr {
+    pub sa_family: sa_family_t,
+    sa_data: [c_char; 14]
+}
+
+#[repr(C)]
+pub struct sockaddr_in {
+    pub sin_family: sa_family_t,
+    pub sin_port: in_port_t,
+    pub sin_addr: in_addr,
+    __pad: [u8; 8]
+}
+
+#[repr(C)]
+pub struct hostent {
+    pub h_name: *const c_char,
+    pub h_aliases: *const *const c_char,
+    pub h_addrtype: c_int,
+    pub h_length: c_int,
+    pub h_addr_list: *const *const c_char
+}
+
+#[repr(C)]
+#[derive(Debug)]
+pub struct timeval {
+    pub tv_sec: time_t,
+    pub tv_usec: suseconds_t
+}
+
+pub type fd_mask = c_ulong;
+pub const FD_SETSIZE: usize = 64;
+pub const NFDBITS: usize = 8 * 8; // Bits in a fd_mask
+
+#[repr(C)]
+#[derive(Debug)]
+pub struct fd_set {
+    pub fds_bits: [fd_mask; (FD_SETSIZE + NFDBITS - 1) / NFDBITS]
+}

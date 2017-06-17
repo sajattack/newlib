@@ -1,5 +1,5 @@
 use syscall;
-use ::types::{c_uint, c_int, c_char, gid_t, uid_t, c_void, c_long, mode_t};
+use ::types::{c_uint, c_int, c_char, gid_t, uid_t, c_void, c_long, mode_t, timeval, fd_set};
 use syscall::error::{Error, EACCES, EPERM, EINVAL};
 use core::ptr::null;
 
@@ -100,4 +100,28 @@ libc_fn!(unsafe vfork() -> c_int {
 
 libc_fn!(_isatty(file: c_int) -> c_int {
     (file == 0 || file == 1 || file == 2) as c_int
+});
+
+libc_fn!(unsafe select(nfds: c_int, readfds: *mut fd_set, writefds: *mut fd_set, errorfds: *mut fd_set, _timeout: *mut timeval) -> Result<c_int> {
+    use ::types::{FD_SETSIZE, NFDBITS};
+    let mut ret = 0;
+    syscall::write(2, b"unimplemented: select()\n").unwrap();
+    if !readfds.is_null() {
+        for i in 0..FD_SETSIZE {
+             if ((*readfds).fds_bits[i/NFDBITS] & (1 << (i % NFDBITS))) != 0 {
+                 ret += 1;
+             }
+        }
+    }
+    if !writefds.is_null() {
+        for i in 0..FD_SETSIZE {
+             if ((*writefds).fds_bits[i/NFDBITS] & (1 << (i % NFDBITS))) != 0 {
+                 ret += 1;
+             }
+        }
+    }
+    if !errorfds.is_null() {
+        (*errorfds).fds_bits = [0; (FD_SETSIZE + NFDBITS - 1) / NFDBITS];
+    }
+    Ok(ret)
 });

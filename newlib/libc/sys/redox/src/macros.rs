@@ -35,6 +35,7 @@ int_fail!(i8);
 int_fail!(i16);
 int_fail!(i32);
 int_fail!(i64);
+int_fail!(isize);
 
 /// If `res` is `Err(..)`, set `errno` and return `-1` or `NULL`, otherwise
 /// unwrap.
