@@ -217,3 +217,9 @@ libc_fn!(ntohl(netlong: [u8; 4]) -> u32 {
 libc_fn!(ntohs(netshort: [u8; 2]) -> u16 {
     BigEndian::read_u16(&netshort)
 });
+
+libc_fn!(setsockopt(socket: c_int, level: c_int, option_name: c_int, option_value: *const c_void, option_len: socklen_t) -> Result<c_int> {
+    syscall::write(2, format!("unimplemented: setsockopt({}, {}, {}, {:?}, {})\n",
+                              socket, level, option_name, option_value, option_len).as_bytes()).unwrap();
+    Err(Error::new(syscall::ENOSYS))
+});

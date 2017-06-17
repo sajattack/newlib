@@ -47,6 +47,7 @@ pub type wchar_t = i16;
 pub type off_t = usize;
 pub type mode_t = u16;
 pub type time_t = i64;
+pub type suseconds_t = c_long;
 pub type pid_t = c_int;
 pub type gid_t = usize;
 pub type uid_t = usize;
@@ -84,4 +85,21 @@ pub struct hostent {
     pub h_addrtype: c_int,
     pub h_length: c_int,
     pub h_addr_list: *const *const c_char
+}
+
+#[repr(C)]
+#[derive(Debug)]
+pub struct timeval {
+    pub tv_sec: time_t,
+    pub tv_usec: suseconds_t
+}
+
+pub type fd_mask = c_ulong;
+pub const FD_SETSIZE: usize = 64;
+pub const NFDBITS: usize = 8 * 8; // Bits in a fd_mask
+
+#[repr(C)]
+#[derive(Debug)]
+pub struct fd_set {
+    pub fds_bits: [fd_mask; (FD_SETSIZE + NFDBITS - 1) / NFDBITS]
 }
