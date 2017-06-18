@@ -73,7 +73,7 @@ pub extern fn rust_begin_panic(_msg: core::fmt::Arguments,
 libc_fn!(unsafe initialize_standard_library() {
     let mut buf = file_read_all("env:").unwrap();
     let size = buf.len();
-    buf.set_len(size + 1);
+    buf.push(0);
 
     let mut vars = Vec::new();
 
@@ -86,7 +86,6 @@ libc_fn!(unsafe initialize_standard_library() {
             buf[i] = b'\0';
         }
     }
-    buf[size] = b'\0';
     vars.push(ptr::null_mut());
 
     environ = vars.as_mut_ptr();
