@@ -2,7 +2,7 @@ use ::{c_int, c_char};
 use syscall::{self, O_CLOEXEC, O_RDONLY, O_DIRECTORY};
 use core::ptr::null;
 use core::slice;
-use collections::boxed::Box;
+use alloc::boxed::Box;
 
 #[repr(C)]
 pub struct dirent {

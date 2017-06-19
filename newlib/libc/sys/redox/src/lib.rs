@@ -1,11 +1,12 @@
 #![no_std]
-#![feature(collections, lang_items, core_intrinsics, compiler_builtins_lib, linkage, drop_types_in_const, const_fn)]
+#![feature(collections, lang_items, core_intrinsics, compiler_builtins_lib, linkage, drop_types_in_const, const_fn, alloc)]
 
 extern crate syscall;
 #[macro_use]
 extern crate collections;
 extern crate compiler_builtins;
 extern crate byteorder;
+extern crate alloc;
 
 use core::{ptr, mem, intrinsics, slice};
 use collections::Vec;
