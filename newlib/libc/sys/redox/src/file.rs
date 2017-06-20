@@ -91,3 +91,11 @@ libc_fn!(unsafe _write(file: c_int, buf: *const c_char, len: c_int) -> Result<c_
 libc_fn!(unsafe chmod(path: *mut c_char, mode: mode_t) -> Result<c_int> {
     Ok(syscall::chmod(::cstr_to_slice(path), mode as usize)? as c_int)
 });
+
+libc_fn!(unsafe realpath(path: *const c_char, resolved_path: *mut c_char) -> Result<*mut c_char> {
+    let fd = syscall::open(::cstr_to_slice(path), O_STAT)?;
+    let buf = slice::from_raw_parts_mut(resolved_path as *mut u8, 4095);
+    let length = syscall::fpath(fd, buf)?;
+    buf[length] = b'\0';
+    Ok(resolved_path)
+});
