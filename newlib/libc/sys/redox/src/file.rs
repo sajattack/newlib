@@ -106,3 +106,7 @@ libc_fn!(unsafe realpath(path: *const c_char, resolved_path: *mut c_char) -> Res
 
     Ok(resolved_path.into_raw())
 });
+
+libc_fn!(fsync(fd: c_int) -> Result<c_int> {
+    Ok(syscall::fsync(fd as usize)? as c_int)
+});
