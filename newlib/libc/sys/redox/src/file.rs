@@ -1,4 +1,4 @@
-use syscall::{self, O_CLOEXEC, O_STAT, O_CREAT, O_EXCL, O_DIRECTORY};
+use syscall::{self, O_CLOEXEC, O_STAT, O_CREAT, O_EXCL, O_DIRECTORY, O_WRONLY};
 use core::slice;
 use ::types::{c_int, c_char, off_t, mode_t, c_void};
 
@@ -105,6 +105,25 @@ libc_fn!(unsafe realpath(path: *const c_char, resolved_path: *mut c_char) -> Res
     syscall::close(fd)?;
 
     Ok(resolved_path.into_raw())
+});
+
+libc_fn!(unsafe _rename(old: *const c_char, new: *const c_char) -> Result<c_int> {
+    // XXX fix this horror when the kernel provides rename() or link()
+    let old = ::cstr_to_slice(old);
+    let new = ::cstr_to_slice(new);
+    let buf = ::file_read_all(old)?;
+
+    let mut stat = syscall::Stat::default();
+    let fd = syscall::open(old, syscall::O_STAT)?;
+    syscall::fstat(fd, &mut stat)?;
+    syscall::close(fd)?;
+    let mode = (stat.st_mode & 0o777) as usize;
+
+    let fd = syscall::open(new, O_CREAT | O_WRONLY | mode)?;
+    syscall::write(fd, &buf)?;
+    syscall::close(fd)?;
+    syscall::unlink(old)?;
+    Ok(0)
 });
 
 libc_fn!(fsync(fd: c_int) -> Result<c_int> {
