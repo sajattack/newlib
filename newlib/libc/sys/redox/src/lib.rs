@@ -16,6 +16,7 @@ use ::types::{c_int, c_void, c_char, size_t};
 mod macros;
 mod types;
 mod dns;
+mod mallocnull;
 pub mod process;
 pub mod file;
 pub mod folder;
@@ -25,10 +26,13 @@ pub mod redox;
 pub mod socket;
 pub mod hostname;
 
+pub use mallocnull::MallocNull;
+
 extern {
     // Newlib uses this function instead of just a global to support reentrancy
     pub fn __errno() -> *mut c_int;
     pub fn malloc(size: size_t) -> *mut c_void;
+    pub fn free(ptr: *mut c_void);
     pub fn strlen(s: *const c_char) -> size_t;
     pub fn __libc_fini_array();
     pub static mut environ: *mut *mut c_char;
