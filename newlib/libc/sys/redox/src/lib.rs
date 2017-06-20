@@ -29,6 +29,7 @@ extern {
     // Newlib uses this function instead of just a global to support reentrancy
     pub fn __errno() -> *mut c_int;
     pub fn malloc(size: size_t) -> *mut c_void;
+    pub fn free(ptr: *mut c_void);
     pub fn strlen(s: *const c_char) -> size_t;
     pub fn __libc_fini_array();
     pub static mut environ: *mut *mut c_char;

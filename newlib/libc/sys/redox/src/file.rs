@@ -1,6 +1,8 @@
 use syscall::{self, O_CLOEXEC, O_STAT, O_CREAT, O_EXCL, O_DIRECTORY};
 use core::slice;
-use ::types::{c_int, c_char, off_t, mode_t};
+use ::types::{c_int, c_char, off_t, mode_t, c_void};
+
+const PATH_MAX: usize = 4096;
 
 
 libc_fn!(unsafe access(path: *mut c_char, _amode: c_int) -> Result<c_int> {
@@ -93,9 +95,25 @@ libc_fn!(unsafe chmod(path: *mut c_char, mode: mode_t) -> Result<c_int> {
 });
 
 libc_fn!(unsafe realpath(path: *const c_char, resolved_path: *mut c_char) -> Result<*mut c_char> {
+    // TODO: find less ugly way to free malloc'd memory on error
     let fd = syscall::open(::cstr_to_slice(path), O_STAT)?;
-    let buf = slice::from_raw_parts_mut(resolved_path as *mut u8, 4095);
-    let length = syscall::fpath(fd, buf)?;
+
+    let mut free_fail = false;
+    let mut resolved_path = resolved_path;
+    if resolved_path.is_null() {
+        resolved_path = ::malloc(PATH_MAX) as *mut c_char;
+        free_fail = true;
+    }
+
+    let buf = slice::from_raw_parts_mut(resolved_path as *mut u8, PATH_MAX-1);
+    let length = syscall::fpath(fd, buf).map_err(|err| {
+        if free_fail {
+            ::free(resolved_path as *mut c_void);
+        }
+        err
+    })?;
     buf[length] = b'\0';
+    let _ = syscall::close(fd);
+
     Ok(resolved_path)
 });
