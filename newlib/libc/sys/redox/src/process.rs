@@ -36,20 +36,14 @@ libc_fn!(unsafe _fork() -> Result<c_int> {
 });
 
 libc_fn!(unsafe getcwd(buf: *mut c_char, size: size_t) -> Result<*const c_char> {
-    let mut buf = buf;
     let mut size = size;
     if size == 0 {
-        size = 4096;
+        size = ::file::PATH_MAX;
     }
-    if buf.is_null() {
-        buf = malloc(size) as *mut c_char;
-        if buf.is_null() {
-            return Ok(null());
-        }
-    } 
-    syscall::getcwd(slice::from_raw_parts_mut(buf as *mut u8, size))?;
-    Ok(buf)
-    // FIXME: buffer too small; free buf when allocated
+    let buf = ::MallocNull::new(buf, size);
+    syscall::getcwd(slice::from_raw_parts_mut(buf.as_mut_ptr() as *mut u8, size))?;
+    Ok(buf.into_raw())
+    // FIXME: buffer too small
 });
 
 libc_fn!(unsafe getwd(buf: *mut c_char) -> Result<*const c_char> {

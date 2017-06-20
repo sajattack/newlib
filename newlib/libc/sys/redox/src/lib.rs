@@ -16,6 +16,7 @@ use ::types::{c_int, c_void, c_char, size_t};
 mod macros;
 mod types;
 mod dns;
+mod mallocnull;
 pub mod process;
 pub mod file;
 pub mod folder;
@@ -24,6 +25,8 @@ pub mod unimpl;
 pub mod redox;
 pub mod socket;
 pub mod hostname;
+
+pub use mallocnull::MallocNull;
 
 extern {
     // Newlib uses this function instead of just a global to support reentrancy
