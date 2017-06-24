@@ -179,7 +179,6 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -190,7 +189,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = cygnus
-INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+INCLUDES = -I$(srcdir)/include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
 lib_a_LIBADD = 
@@ -206,7 +205,14 @@ rust_sources = \
     src/process.rs \
     src/file.rs \
     src/time.rs \
-    src/unimpl.rs
+    src/folder.rs \
+    src/unimpl.rs \
+    src/socket.rs \
+    src/types.rs \
+    src/hostname.rs \
+    src/dns/answer.rs \
+    src/dns/mod.rs \
+    src/dns/query.rs
 
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
@@ -389,7 +395,7 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-data-local
 
 install-dvi: install-dvi-am
 
@@ -443,17 +449,17 @@ uninstall-am:
 	clean-generic clean-noinstLIBRARIES ctags distclean \
 	distclean-compile distclean-generic distclean-tags dvi dvi-am \
 	html html-am info info-am install install-am install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
+	install-data-am install-data-local install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
 	uninstall-am
 
 
-$(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a: Cargo.toml $(rust_sources)
+$(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a: Xargo.toml Cargo.toml $(rust_sources)
 	cd $(srcdir); CC=x86_64-elf-redox-gcc CFLAGS="$(CFLAGS) -I $(srcdir)/../../include" xargo build --target x86_64-unknown-redox --release
 
 lib.a: $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a
@@ -488,6 +494,10 @@ docbook: $(DOCBOOK_OUT_FILES)
 	do \
 	  ${top_srcdir}/../doc/chapter-texi2docbook.py <$(srcdir)/$${chapter%.xml}.tex >../$$chapter ; \
 	done
+
+install-data-local:
+	$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/arpa;
+	$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/netinet;
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
