@@ -64,6 +64,10 @@ libc_fn!(unsafe _getpid() -> pid_t {
     syscall::getpid().unwrap() as pid_t
 });
 
+libc_fn!(unsafe getppid() -> pid_t {
+    syscall::getppid().unwrap() as pid_t
+});
+
 libc_fn!(unsafe getegid() -> gid_t {
     syscall::getegid().unwrap() as gid_t
 });
