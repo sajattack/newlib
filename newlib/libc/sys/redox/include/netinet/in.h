@@ -10,6 +10,11 @@
 #define	IPPROTO_TCP 6
 #define	IPPROTO_UDP 17
 
+#define INADDR_ANY ((in_addr_t) 0x00000000)
+#define INADDR_BROADCAST ((in_addr_t) 0xffffffff)
+#define INADDR_NONE ((in_addr_t) 0xffffffff)
+#define INADDR_LOOPBACK ((in_addr_t) 0x7f000001) // 127.0.0.1
+
 typedef uint16_t sa_family_t;
 typedef uint32_t in_addr_t;
 typedef uint16_t in_port_t;
