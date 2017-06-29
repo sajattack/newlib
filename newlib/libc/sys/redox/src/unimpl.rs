@@ -31,33 +31,8 @@ libc_fn!(_fcntl(_file: c_int, _cmd: c_int) -> Result<c_int> {
     UNIMPL!(_fcntl, EACCES)
 });
 
-// XXX return value pointer type
-libc_fn!(_gethostbyname(_name: *const c_char) -> Result<*const c_void> {
-    Ok(null())
-});
-
 libc_fn!(_getdtablesize() -> Result<c_int> {
     Ok(65536)
-});
-
-// XXX return value pointer type
-libc_fn!(_getgrnam(_name: *const c_char) -> Result<*const c_void> {
-    Ok(null())
-});
-
-// XXX return value pointer type
-libc_fn!(_getgrgid(_gid: gid_t) -> Result<*const c_void> {
-    Ok(null())
-});
-
-// XXX return value pointer type
-libc_fn!(_getpwnam(_name: *const c_char) -> Result<*const c_void> {
-    Ok(null())
-});
-
-// XXX return value pointer type
-libc_fn!(_getpwuid(_gid: uid_t) -> Result<*const c_void> {
-    Ok(null())
 });
 
 // XXX variadic
