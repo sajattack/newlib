@@ -1,9 +1,10 @@
 use core::str::{self, FromStr};
 use core::mem;
+use core::ptr;
 use libc::{c_int, c_char, size_t, c_void, ssize_t};
 use ::types::{socklen_t, in_addr, sockaddr, sockaddr_in};
 use syscall::{self, O_RDWR};
-use syscall::error::{Error, EPROTOTYPE, EPROTONOSUPPORT, EAFNOSUPPORT, EINVAL, EOPNOTSUPP, ENOBUFS};
+use syscall::error::{Error, EPROTOTYPE, EPROTONOSUPPORT, EAFNOSUPPORT, EINVAL, EOPNOTSUPP, ENOBUFS, ENOSPC};
 use core::slice;
 use collections::Vec;
 use byteorder::{BigEndian, ByteOrder};
@@ -13,32 +14,49 @@ pub const AF_INET: c_int = 2;
 pub const SOCK_STREAM: c_int = 1;
 pub const SOCK_DGRAM: c_int = 2;
 
-static mut NTOA_ADDR: Option<Vec<u8>> = None;
+static mut NTOA_ADDR: [c_char; 16] = [0; 16];
 
 libc_fn!(unsafe inet_aton(cp: *const c_char, inp: *mut in_addr) -> c_int {
-    // TODO: octal/hex; more modern functions
-    let addr = &mut (*inp).s_addr;
-    let mut octets = str::from_utf8_unchecked(::cstr_to_slice(cp)).split('.');
-    for i in 0..4 {
-        if let Some(n) = octets.next().and_then(|x| u8::from_str(x).ok()) {
-            addr[i] = n;
-        } else {
-            return 0;
-        }
-    }
-    if octets.next() == None {
-        1 // Success
-    } else {
-        0
-    }
+    // TODO: octal/hex
+    inet_pton(AF_INET, cp, inp as *mut c_void)
 });
 
 libc_fn!(unsafe inet_ntoa(inp: *const in_addr) -> *const c_char {
-    let s_addr = (*inp).s_addr;
-    let addr = format!("{}.{}.{}.{}\0", s_addr[0], s_addr[1], s_addr[2], s_addr[3]).into_bytes();
-    let ptr = addr.as_ptr();
-    NTOA_ADDR = Some(addr);
-    ptr as *const c_char
+    inet_ntop(AF_INET, inp as *const c_void, NTOA_ADDR.as_mut_ptr(), 16)
+});
+
+libc_fn!(unsafe inet_pton(domain: c_int, src: *const c_char, dest: *mut c_void) -> Result<c_int> {
+    if domain != AF_INET {
+        Err(Error::new(EAFNOSUPPORT))
+    } else {
+        let s_addr = &mut ((*(dest as *mut in_addr)).s_addr);
+        let mut octets = str::from_utf8_unchecked(::cstr_to_slice(src)).split('.');
+        for i in 0..4 {
+            if let Some(n) = octets.next().and_then(|x| u8::from_str(x).ok()) {
+                s_addr[i] = n;
+            } else {
+                return Ok(0);
+            }
+        }
+        if octets.next() == None {
+            Ok(1) // Success
+        } else {
+            Ok(0)
+        }
+    }
+});
+
+libc_fn!(unsafe inet_ntop(domain: c_int, src: *const c_void, dest: *mut c_char, size: socklen_t) -> Result<*const c_char> {
+    if domain != AF_INET {
+        Err(Error::new(EAFNOSUPPORT))
+    } else if size < 16 {
+        Err(Error::new(ENOSPC))
+    } else {
+        let s_addr = (&*(src as *const in_addr)).s_addr;
+        let addr = format!("{}.{}.{}.{}\0", s_addr[0], s_addr[1], s_addr[2], s_addr[3]);
+        ptr::copy(addr.as_ptr() as *const c_char, dest, addr.len());
+        Ok(dest)
+    }
 });
 
 libc_fn!(unsafe socket(domain: c_int, type_: c_int, protocol: c_int) -> Result<c_int> {
