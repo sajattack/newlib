@@ -1,5 +1,6 @@
 use syscall;
-use ::types::{c_uint, c_int, c_char, gid_t, uid_t, c_void, c_long, mode_t, timeval, fd_set};
+use libc::{c_uint, c_int, c_char, gid_t, uid_t, c_void, c_long, mode_t};
+use ::types::{timeval, fd_set};
 use syscall::error::{Error, EACCES, EPERM, EINVAL};
 use core::ptr::null;
 
@@ -30,33 +31,8 @@ libc_fn!(_fcntl(_file: c_int, _cmd: c_int) -> Result<c_int> {
     UNIMPL!(_fcntl, EACCES)
 });
 
-// XXX return value pointer type
-libc_fn!(_gethostbyname(_name: *const c_char) -> Result<*const c_void> {
-    Ok(null())
-});
-
 libc_fn!(_getdtablesize() -> Result<c_int> {
     Ok(65536)
-});
-
-// XXX return value pointer type
-libc_fn!(_getgrnam(_name: *const c_char) -> Result<*const c_void> {
-    Ok(null())
-});
-
-// XXX return value pointer type
-libc_fn!(_getgrgid(_gid: gid_t) -> Result<*const c_void> {
-    Ok(null())
-});
-
-// XXX return value pointer type
-libc_fn!(_getpwnam(_name: *const c_char) -> Result<*const c_void> {
-    Ok(null())
-});
-
-// XXX return value pointer type
-libc_fn!(_getpwuid(_gid: uid_t) -> Result<*const c_void> {
-    Ok(null())
 });
 
 // XXX variadic
