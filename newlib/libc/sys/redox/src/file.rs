@@ -1,6 +1,6 @@
 use syscall::{self, O_CLOEXEC, O_STAT, O_CREAT, O_EXCL, O_DIRECTORY, O_WRONLY};
 use core::slice;
-use libc::{c_int, c_char, off_t, mode_t, c_void};
+use libc::{c_int, c_char, off_t, mode_t, c_void, size_t, ssize_t};
 
 pub const PATH_MAX: usize = 4096;
 
@@ -128,4 +128,18 @@ libc_fn!(unsafe _rename(old: *const c_char, new: *const c_char) -> Result<c_int>
 
 libc_fn!(fsync(fd: c_int) -> Result<c_int> {
     Ok(syscall::fsync(fd as usize)? as c_int)
+});
+
+libc_fn!(unsafe symlink(path1: *const c_char, path2: *const c_char) -> Result<c_int> {
+    let fd = syscall::open(::cstr_to_slice(path2), syscall::O_SYMLINK | syscall::O_CREAT | syscall::O_WRONLY | 0o777)?;
+    syscall::write(fd, ::cstr_to_slice(path1))?;
+    syscall::close(fd)?;
+    Ok(0)
+});
+
+libc_fn!(unsafe readlink(path: *const c_char, buf: *const c_char, bufsize: size_t) -> Result<ssize_t> {
+    let fd = syscall::open(::cstr_to_slice(path), syscall::O_SYMLINK | syscall::O_RDONLY)?;
+    let count = syscall::read(fd, slice::from_raw_parts_mut(buf as *mut u8, bufsize))?;
+    syscall::close(fd)?;
+    Ok(count as ssize_t)
 });
