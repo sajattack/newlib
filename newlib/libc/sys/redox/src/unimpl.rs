@@ -40,11 +40,6 @@ libc_fn!(_ioctl(_file: c_int, _request: c_int) -> Result<c_int> {
     UNIMPL!(_ioctl, EINVAL)
 });
 
-// TODO: Actually implement lstat, it currently just calls stat
-libc_fn!(unsafe lstat(path: *const c_char, sbuf: *mut syscall::Stat) -> c_int {
-    ::file::_stat(path, sbuf)
-});
-
 libc_fn!(_link(_old: *const c_char, _new: *const c_char) -> Result<c_int> {
     UNIMPL!(_link, EPERM)
 });
