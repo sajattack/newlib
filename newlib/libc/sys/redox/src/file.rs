@@ -1,4 +1,4 @@
-use syscall::{self, O_CLOEXEC, O_STAT, O_CREAT, O_EXCL, O_DIRECTORY, O_WRONLY};
+use syscall::{self, O_CLOEXEC, O_STAT, O_CREAT, O_EXCL, O_DIRECTORY, O_WRONLY, O_NOFOLLOW};
 use core::slice;
 use libc::{c_int, c_char, off_t, mode_t, c_void, size_t, ssize_t};
 
@@ -81,6 +81,13 @@ libc_fn!(unsafe _stat(path: *const c_char, st: *mut syscall::Stat) -> Result<c_i
     Ok(ret)
 });
 
+libc_fn!(unsafe lstat(path: *const c_char, st: *mut syscall::Stat) -> Result<c_int> {
+    let fd = syscall::open(::cstr_to_slice(path), O_CLOEXEC | O_STAT | O_NOFOLLOW)?;
+    let ret = _fstat(fd as c_int, st);
+    let _ = syscall::close(fd);
+    Ok(ret)
+});
+
 libc_fn!(unsafe _unlink(path: *mut c_char) -> Result<c_int> {
     Ok(syscall::unlink(::cstr_to_slice(path))? as c_int)
 });
@@ -138,7 +145,7 @@ libc_fn!(unsafe symlink(path1: *const c_char, path2: *const c_char) -> Result<c_
 });
 
 libc_fn!(unsafe readlink(path: *const c_char, buf: *const c_char, bufsize: size_t) -> Result<ssize_t> {
-    let fd = syscall::open(::cstr_to_slice(path), syscall::O_SYMLINK | syscall::O_RDONLY)?;
+    let fd = syscall::open(::cstr_to_slice(path), syscall::O_SYMLINK | syscall::O_RDONLY | syscall::O_NOFOLLOW)?;
     let count = syscall::read(fd, slice::from_raw_parts_mut(buf as *mut u8, bufsize))?;
     syscall::close(fd)?;
     Ok(count as ssize_t)
