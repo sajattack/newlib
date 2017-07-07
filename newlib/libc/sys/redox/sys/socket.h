@@ -6,6 +6,9 @@
 #define AF_UNSPEC 0
 #define AF_INET 2
 
+#define PF_UNSPEC 0
+#define PF_INET 2
+
 #define SOCK_STREAM 1
 #define SOCK_DGRAM 2
 
