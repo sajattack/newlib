@@ -270,6 +270,8 @@ useconds_t _EXFUN(ualarm, (useconds_t __useconds, useconds_t __interval));
 char *	_EXFUN(mktemp, (char *));
 #endif
 
+int	_EXFUN(gethostname, (char *__name, size_t __len));
+
 #if defined(__CYGWIN__) || defined(__SPU__) || defined(__rtems__)
 void    _EXFUN(sync, (void));
 #endif
