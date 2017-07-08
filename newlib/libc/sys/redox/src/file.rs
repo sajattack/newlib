@@ -7,8 +7,7 @@ pub const PATH_MAX: usize = 4096;
 
 libc_fn!(unsafe access(path: *mut c_char, _amode: c_int) -> Result<c_int> {
     // XXX amode
-    let fd = syscall::open(::cstr_to_slice(path), O_CLOEXEC | O_STAT)?;
-    syscall::close(fd)?;
+    let fd = ::RawFile::open(::cstr_to_slice(path), O_CLOEXEC | O_STAT)?;
     Ok(0)
 });
 
@@ -43,8 +42,7 @@ libc_fn!(unsafe _lseek(file: c_int, ptr: c_int, dir: c_int) -> Result<c_int> {
 
 libc_fn!(unsafe mkdir(path: *mut c_char, mode: mode_t) -> Result<c_int> {
     let flags = O_CREAT | O_EXCL | O_CLOEXEC | O_DIRECTORY | (mode as usize & 0o777);
-    let fd = syscall::open(::cstr_to_slice(path), flags)?;
-    syscall::close(fd)?;
+    let fd = ::RawFile::open(::cstr_to_slice(path), flags)?;
     Ok(0)
 });
 
@@ -75,17 +73,13 @@ libc_fn!(unsafe rmdir(path: *mut c_char) -> Result<c_int> {
 });
 
 libc_fn!(unsafe _stat(path: *const c_char, st: *mut syscall::Stat) -> Result<c_int> {
-    let fd = syscall::open(::cstr_to_slice(path), O_CLOEXEC | O_STAT)?;
-    let ret = _fstat(fd as c_int, st);
-    let _ = syscall::close(fd);
-    Ok(ret)
+    let fd = ::RawFile::open(::cstr_to_slice(path), O_CLOEXEC | O_STAT)?;
+    Ok(_fstat(*fd as c_int, st))
 });
 
 libc_fn!(unsafe lstat(path: *const c_char, st: *mut syscall::Stat) -> Result<c_int> {
-    let fd = syscall::open(::cstr_to_slice(path), O_CLOEXEC | O_STAT | O_NOFOLLOW)?;
-    let ret = _fstat(fd as c_int, st);
-    let _ = syscall::close(fd);
-    Ok(ret)
+    let fd = ::RawFile::open(::cstr_to_slice(path), O_CLOEXEC | O_STAT | O_NOFOLLOW)?;
+    Ok(_fstat(*fd as c_int, st))
 });
 
 libc_fn!(unsafe _unlink(path: *mut c_char) -> Result<c_int> {
@@ -102,14 +96,12 @@ libc_fn!(unsafe chmod(path: *mut c_char, mode: mode_t) -> Result<c_int> {
 });
 
 libc_fn!(unsafe realpath(path: *const c_char, resolved_path: *mut c_char) -> Result<*mut c_char> {
-    // TODO: find less ugly way to free malloc'd memory on error
-    let fd = syscall::open(::cstr_to_slice(path), O_STAT)?;
+    let fd = ::RawFile::open(::cstr_to_slice(path), O_STAT)?;
 
     let mut resolved_path = ::MallocNull::new(resolved_path, PATH_MAX);
     let buf = slice::from_raw_parts_mut(resolved_path.as_mut_ptr() as *mut u8, PATH_MAX-1);
-    let length = syscall::fpath(fd, buf)?;
+    let length = syscall::fpath(*fd, buf)?;
     buf[length] = b'\0';
-    syscall::close(fd)?;
 
     Ok(resolved_path.into_raw())
 });
@@ -121,14 +113,13 @@ libc_fn!(unsafe _rename(old: *const c_char, new: *const c_char) -> Result<c_int>
     let buf = ::file_read_all(old)?;
 
     let mut stat = syscall::Stat::default();
-    let fd = syscall::open(old, syscall::O_STAT)?;
-    syscall::fstat(fd, &mut stat)?;
-    syscall::close(fd)?;
+    let fd = ::RawFile::open(old, syscall::O_STAT)?;
+    syscall::fstat(*fd, &mut stat)?;
+    drop(fd);
     let mode = (stat.st_mode & 0o777) as usize;
 
-    let fd = syscall::open(new, O_CREAT | O_WRONLY | mode)?;
-    syscall::write(fd, &buf)?;
-    syscall::close(fd)?;
+    let fd = ::RawFile::open(new, O_CREAT | O_WRONLY | mode)?;
+    syscall::write(*fd, &buf)?;
     syscall::unlink(old)?;
     Ok(0)
 });

@@ -54,27 +54,27 @@ fn lookup_host(host: &str) -> Result<LookupHost> {
 
         let packet_data = packet.compile();
 
-        let fd = syscall::open(format!("udp:{}.{}.{}.{}:0",
-                                       ip[0], ip[1], ip[2], ip[3]).as_bytes(),
-                               syscall::O_RDWR)?;
+        let fd = ::RawFile::open(format!("udp:{}.{}.{}.{}:0",
+                                         ip[0], ip[1], ip[2], ip[3]).as_bytes(),
+                                 syscall::O_RDWR)?;
 
         let timeout = syscall::TimeSpec {
             tv_sec: 5,
             tv_nsec: 0,
         };
-        let rt = syscall::dup(fd, b"read_timeout")?;
-        syscall::write(rt, &timeout)?;
-        syscall::close(rt)?;
-        let wt = syscall::dup(fd, b"write_timeout")?;
-        syscall::write(wt, &timeout)?;
-        syscall::close(wt)?;
+        let rt = fd.dup(b"read_timeout")?;
+        syscall::write(*rt, &timeout)?;
+        drop(rt);
+        let wt = fd.dup(b"write_timeout")?;
+        syscall::write(*wt, &timeout)?;
+        drop(wt);
 
-        let sendrecvfd = syscall::dup(fd, format!("{}.{}.{}.{}:53", dns[0], dns[1], dns[2], dns[3]).as_bytes())?;
-        syscall::write(sendrecvfd, &packet_data)?;
+        let sendrecvfd = fd.dup(format!("{}.{}.{}.{}:53", dns[0], dns[1], dns[2], dns[3]).as_bytes())?;
+        syscall::write(*sendrecvfd, &packet_data)?;
         let mut buf = [0; 65536];
-        let count = syscall::read(sendrecvfd, &mut buf)?;
-        syscall::close(sendrecvfd)?;
-        syscall::close(fd)?;
+        let count = syscall::read(*sendrecvfd, &mut buf)?;
+        drop(sendrecvfd);
+        drop(fd);
 
         match Dns::parse(&buf[.. count]) {
             Ok(response) => {
@@ -128,9 +128,8 @@ libc_fn!(unsafe gethostbyname(name: *const c_char) -> Result<*const hostent> {
 
 libc_fn!(unsafe gethostname(name: *mut c_char, namelen: size_t) -> Result<c_int> {
     let slice = slice::from_raw_parts_mut(name as *mut u8, namelen);
-    let fd = syscall::open("/etc/hostname", syscall::O_RDONLY)?;
-    let len = syscall::read(fd, &mut slice[..namelen-1])?;
+    let fd = ::RawFile::open("/etc/hostname", syscall::O_RDONLY)?;
+    let len = syscall::read(*fd, &mut slice[..namelen-1])?;
     slice[len] = b'\0';
-    syscall::close(fd)?;
     Ok(0)
 });

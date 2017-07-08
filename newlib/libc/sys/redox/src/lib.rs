@@ -18,6 +18,7 @@ mod macros;
 mod types;
 mod dns;
 mod mallocnull;
+mod rawfile;
 pub mod process;
 pub mod file;
 pub mod folder;
@@ -28,6 +29,7 @@ pub mod socket;
 pub mod hostname;
 
 pub use mallocnull::MallocNull;
+pub use rawfile::RawFile;
 
 extern {
     // Newlib uses this function instead of just a global to support reentrancy
@@ -47,17 +49,15 @@ pub unsafe fn cstr_to_slice_mut<'a>(buf: *const c_char) ->  &'a mut [u8] {
 }
 
 pub fn file_read_all<T: AsRef<[u8]>>(path: T) -> syscall::Result<Vec<u8>> {
-    let fd = syscall::open(path, syscall::O_RDONLY)?;
+    let fd = RawFile::open(path, syscall::O_RDONLY)?;
 
     let mut st = syscall::Stat::default();
-    syscall::fstat(fd, &mut st)?;
+    syscall::fstat(*fd, &mut st)?;
     let size = st.st_size as usize;
 
     let mut buf = Vec::with_capacity(size);
     unsafe { buf.set_len(size) };
-    syscall::read(fd, buf.as_mut_slice())?;
-
-    syscall::close(fd)?;
+    syscall::read(*fd, buf.as_mut_slice())?;
 
     Ok(buf)
 }
