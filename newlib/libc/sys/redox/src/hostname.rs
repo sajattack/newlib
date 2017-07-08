@@ -1,11 +1,11 @@
 use core::ptr::null;
-use core::{mem, str};
+use core::{mem, str, slice};
 use collections::vec::IntoIter;
 use collections::string::ToString;
 use collections::{Vec, String};
 use ::dns::{Dns, DnsQuery};
 use syscall::{self, Result, EINVAL, Error};
-use libc::c_char;
+use libc::{c_char, size_t, c_int};
 use ::types::{in_addr, hostent};
 
 static mut HOST_ENTRY: hostent = hostent { h_name: null(), h_aliases: null(), h_addrtype: 0, h_length: 0, h_addr_list: null() };
@@ -124,4 +124,13 @@ libc_fn!(unsafe gethostbyname(name: *const c_char) -> Result<*const hostent> {
     HOST_NAME = Some(host_name);
 
     Ok(&HOST_ENTRY as *const hostent)
+});
+
+libc_fn!(unsafe gethostname(name: *mut c_char, namelen: size_t) -> Result<c_int> {
+    let slice = slice::from_raw_parts_mut(name as *mut u8, namelen);
+    let fd = syscall::open("/etc/hostname", syscall::O_RDONLY)?;
+    let len = syscall::read(fd, &mut slice[..namelen-1])?;
+    slice[len] = b'\0';
+    syscall::close(fd)?;
+    Ok(0)
 });
