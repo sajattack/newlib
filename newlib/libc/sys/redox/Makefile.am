@@ -19,6 +19,7 @@ rust_sources = \
     src/time.rs \
     src/folder.rs \
     src/unimpl.rs \
+    src/user.rs \
     src/socket.rs \
     src/types.rs \
     src/hostname.rs \
