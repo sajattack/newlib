@@ -170,3 +170,8 @@ libc_fn!(unsafe futimens(fd: c_int, times: *const [TimeSpec; 2]) -> Result<c_int
     syscall::futimens(fd as usize, &*times)?;
     Ok(0)
 });
+
+// XXX variadic
+libc_fn!(_fcntl(file: c_int, cmd: c_int, arg: c_int) -> Result<c_int> {
+    Ok(syscall::fcntl(file as usize, cmd as usize, arg as usize)? as c_int)
+});

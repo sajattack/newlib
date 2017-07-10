@@ -26,11 +26,6 @@ libc_fn!(chown(_path: *mut c_char, _order: uid_t, _group: gid_t) -> Result<c_int
     UNIMPL!(chown, EACCES)
 });
 
-// XXX variadic
-libc_fn!(_fcntl(_file: c_int, _cmd: c_int) -> Result<c_int> {
-    UNIMPL!(_fcntl, EACCES)
-});
-
 libc_fn!(_getdtablesize() -> Result<c_int> {
     Ok(65536)
 });
