@@ -24,6 +24,7 @@ pub mod file;
 pub mod folder;
 pub mod time;
 pub mod unimpl;
+pub mod user;
 pub mod redox;
 pub mod socket;
 pub mod hostname;

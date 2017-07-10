@@ -57,3 +57,14 @@ pub const NFDBITS: usize = 8 * 8; // Bits in a fd_mask
 pub struct fd_set {
     pub fds_bits: [fd_mask; (FD_SETSIZE + NFDBITS - 1) / NFDBITS]
 }
+
+#[repr(C)]
+pub struct passwd {
+    pub pw_name: *const libc::c_char,
+    pub pw_passwd: *const libc::c_char,
+    pub pw_uid: libc::uid_t,
+    pub pw_gid: libc::gid_t,
+    pub pw_gecos: *const libc::c_char,
+    pub pw_dir: *const libc::c_char,
+    pub pw_shell: *const libc::c_char
+}
