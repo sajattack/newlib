@@ -48,6 +48,12 @@ pub struct timeval {
     pub tv_usec: suseconds_t
 }
 
+#[repr(C)]
+pub struct utimbuf {
+    pub actime: time_t,
+    pub modtime: time_t
+}
+
 pub type fd_mask = libc::c_ulong;
 pub const FD_SETSIZE: usize = 64;
 pub const NFDBITS: usize = 8 * 8; // Bits in a fd_mask
