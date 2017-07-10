@@ -60,11 +60,6 @@ libc_fn!(umask(_mode: mode_t) -> mode_t {
     0o000
 });
 
-// XXX type of argument pointer
-libc_fn!(utime(_filename: *const c_char, _times: *mut c_void) -> Result<c_int> {
-    UNIMPL!(utime, EACCES)
-});
-
 libc_fn!(unsafe vfork() -> c_int {
     ::process::_fork()
 });

@@ -2,17 +2,13 @@ use syscall;
 use syscall::data::TimeSpec;
 use syscall::error::{Error, EFAULT};
 use libc::{c_int, c_void, time_t, c_long};
-
-pub struct TimeVal {
-    pub tv_sec: time_t,
-    pub tv_usec: c_long,
-}
+use types::timeval;
 
 libc_fn!(unsafe clock_gettime(clk_id: c_int, tp: *mut TimeSpec) -> Result<c_int> {
     Ok(syscall::clock_gettime(clk_id as usize, &mut *tp)? as c_int)
 });
 
-libc_fn!(unsafe _gettimeofday(tv: *mut TimeVal, _tz: *const c_void) -> Result<c_int> {
+libc_fn!(unsafe _gettimeofday(tv: *mut timeval, _tz: *const c_void) -> Result<c_int> {
     if !tv.is_null() {
         let mut tp = TimeSpec::default();
         syscall::clock_gettime(syscall::flag::CLOCK_REALTIME, &mut tp)?;
