@@ -5,10 +5,7 @@ struct dirent {
     char d_name[4096];
 };
 
-typedef struct {
-    int dd_fd;		/* directory file */
-    struct dirent dd_ent;
-} DIR;
+typedef struct __dirstream DIR;
 
 
 #define __dirfd(dir) (dir)->dd_fd
