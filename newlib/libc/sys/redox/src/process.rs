@@ -120,12 +120,14 @@ libc_fn!(unsafe _sched_yield() -> Result<c_int> {
 libc_fn!(unsafe _system(s: *const c_char) -> Result<c_int> {
     match syscall::clone(0)? {
         0 => {
+            let shell = "/bin/sh";
             let arg1 = "-c";
             let args = [
+                [shell.as_ptr() as usize, shell.len()],
                 [arg1.as_ptr() as usize, arg1.len()],
                 [s as usize, ::strlen(s)]
             ];
-            syscall::execve("/bin/sh", &args)?;
+            syscall::execve(shell, &args)?;
             syscall::exit(100)?;
             unreachable!()
         }
