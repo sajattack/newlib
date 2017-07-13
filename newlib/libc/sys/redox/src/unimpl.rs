@@ -25,11 +25,6 @@ libc_fn!(chown(_path: *mut c_char, _order: uid_t, _group: gid_t) -> Result<c_int
     UNIMPL!(chown, EACCES)
 });
 
-// XXX variadic
-libc_fn!(_fcntl(_file: c_int, _cmd: c_int) -> Result<c_int> {
-    UNIMPL!(_fcntl, EACCES)
-});
-
 libc_fn!(_getdtablesize() -> Result<c_int> {
     Ok(65536)
 });
@@ -57,11 +52,6 @@ libc_fn!(_times(_buf: *mut c_void) -> Result<clock_t> {
 libc_fn!(umask(_mode: mode_t) -> mode_t {
     // All permissions granted
     0o000
-});
-
-// XXX type of argument pointer
-libc_fn!(utime(_filename: *const c_char, _times: *mut c_void) -> Result<c_int> {
-    UNIMPL!(utime, EACCES)
 });
 
 libc_fn!(unsafe vfork() -> c_int {

@@ -1,6 +1,7 @@
-use syscall::{self, O_CLOEXEC, O_STAT, O_CREAT, O_EXCL, O_DIRECTORY, O_WRONLY, O_NOFOLLOW};
+use syscall::{self, O_CLOEXEC, O_STAT, O_CREAT, O_EXCL, O_DIRECTORY, O_WRONLY, O_NOFOLLOW, TimeSpec};
 use core::slice;
 use libc::{c_int, c_char, off_t, mode_t, c_void, size_t, ssize_t};
+use ::types::{utimbuf, timeval, suseconds_t};
 
 pub const PATH_MAX: usize = 4096;
 
@@ -140,4 +141,37 @@ libc_fn!(unsafe readlink(path: *const c_char, buf: *const c_char, bufsize: size_
     let count = syscall::read(fd, slice::from_raw_parts_mut(buf as *mut u8, bufsize))?;
     syscall::close(fd)?;
     Ok(count as ssize_t)
+});
+
+libc_fn!(unsafe utime(path: *mut c_char, times: *const utimbuf) -> Result<c_int> {
+    let times = if times.is_null() {
+        let mut tp = TimeSpec::default();
+        syscall::clock_gettime(syscall::flag::CLOCK_REALTIME, &mut tp)?;
+        [tp, tp]
+    } else {
+        [TimeSpec { tv_sec: (*times).actime, tv_nsec: 0 },
+         TimeSpec { tv_sec: (*times).modtime, tv_nsec: 0 }]
+    };
+    let fd = ::RawFile::open(::cstr_to_slice(path), O_WRONLY)?;
+    syscall::futimens(*fd, &times);
+    Ok(0)
+});
+
+libc_fn!(unsafe utimes(path: *mut c_char, times: *const [timeval; 2]) -> Result<c_int> {
+    let times =  [TimeSpec { tv_sec: (*times)[0].tv_sec, tv_nsec: (*times)[0].tv_usec as i32 * 1000 },
+                  TimeSpec { tv_sec: (*times)[1].tv_sec, tv_nsec: (*times)[0].tv_usec as i32 * 1000 }];
+    let fd = ::RawFile::open(::cstr_to_slice(path), O_WRONLY)?;
+    syscall::futimens(*fd, &times);
+    Ok(0)
+});
+
+libc_fn!(unsafe futimens(fd: c_int, times: *const [TimeSpec; 2]) -> Result<c_int> {
+    // XXX UTIME_NOW and UTIME_OMIT (in redoxfs?)
+    syscall::futimens(fd as usize, &*times)?;
+    Ok(0)
+});
+
+// XXX variadic
+libc_fn!(_fcntl(file: c_int, cmd: c_int, arg: c_int) -> Result<c_int> {
+    Ok(syscall::fcntl(file as usize, cmd as usize, arg as usize)? as c_int)
 });
