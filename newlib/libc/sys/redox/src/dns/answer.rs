@@ -8,8 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use collections::String;
-use collections::Vec;
+use alloc::String;
+use alloc::Vec;
 
 #[derive(Clone, Debug)]
 pub struct DnsAnswer {

@@ -1,11 +1,9 @@
 use libc::{c_char, c_int, c_void, size_t, gid_t, uid_t, ptrdiff_t};
 use ::types::pid_t;
 use core::slice;
-use core::ptr::null;
-use collections::Vec;
+use alloc::Vec;
 use syscall::error::{Error, EINVAL};
 use syscall;
-use ::malloc;
 
 const MAXPATHLEN: usize = 1024;
 static mut CURR_BRK: usize = 0;
@@ -21,7 +19,7 @@ libc_fn!(unsafe _exit(code: c_int) {
 
 libc_fn!(unsafe _execve(name: *const c_char, argv: *const *const c_char, _env: *const *const c_char) -> Result<c_int> {
     // XXX Handle env
-    
+
     let mut args: Vec<[usize; 2]> = Vec::new();
     let mut arg = argv;
     while !(*arg).is_null() {

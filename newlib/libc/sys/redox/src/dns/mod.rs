@@ -13,8 +13,8 @@ pub use self::query::DnsQuery;
 
 use core::slice;
 use core::u16;
-use collections::String;
-use collections::Vec;
+use alloc::String;
+use alloc::Vec;
 
 mod answer;
 mod query;

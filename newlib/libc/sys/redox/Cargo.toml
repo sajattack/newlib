@@ -10,6 +10,9 @@ crate-type = ["staticlib"]
 lto = true
 
 [dependencies]
-redox_syscall = "0.1"
 byteorder = { version = "1", default-features = false }
 libc = { version = "0.2", default-features = false }
+redox_syscall = "0.1"
+
+[dependencies.compiler_builtins]
+git = "https://github.com/rust-lang-nursery/compiler-builtins"

@@ -1,16 +1,27 @@
 #![no_std]
-#![feature(collections, lang_items, core_intrinsics, compiler_builtins_lib, linkage, drop_types_in_const, const_fn, alloc)]
+#![feature(
+    alloc,
+    allocator_api,
+    alloc_system,
+    compiler_builtins_lib,
+    const_fn,
+    core_intrinsics,
+    drop_types_in_const,
+    global_allocator,
+    lang_items,
+    linkage,
+)]
 
-extern crate syscall;
 #[macro_use]
-extern crate collections;
-extern crate compiler_builtins;
-extern crate byteorder;
 extern crate alloc;
+extern crate alloc_system;
+extern crate byteorder;
+extern crate compiler_builtins;
 extern crate libc;
+extern crate syscall;
 
+use alloc::Vec;
 use core::{ptr, mem, intrinsics, slice};
-use collections::Vec;
 use libc::{c_int, c_void, c_char, size_t};
 
 #[macro_use]
@@ -30,6 +41,9 @@ pub mod hostname;
 
 pub use mallocnull::MallocNull;
 pub use rawfile::RawFile;
+
+#[global_allocator]
+static ALLOCATOR: alloc_system::System = alloc_system::System;
 
 extern {
     // Newlib uses this function instead of just a global to support reentrancy

@@ -6,7 +6,6 @@ use ::types::{socklen_t, in_addr, sockaddr, sockaddr_in};
 use syscall::{self, O_RDWR};
 use syscall::error::{Error, EPROTOTYPE, EPROTONOSUPPORT, EAFNOSUPPORT, EINVAL, EOPNOTSUPP, ENOBUFS, ENOSPC};
 use core::slice;
-use collections::Vec;
 use byteorder::{BigEndian, ByteOrder};
 
 

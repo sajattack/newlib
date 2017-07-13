@@ -2,7 +2,6 @@ use syscall;
 use libc::{c_uint, c_int, c_char, gid_t, uid_t, c_void, c_long, mode_t};
 use ::types::{timeval, fd_set};
 use syscall::error::{Error, EACCES, EPERM, EINVAL};
-use core::ptr::null;
 
 #[allow(non_camel_case_types)]
 type clock_t = c_long;
