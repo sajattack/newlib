@@ -33,8 +33,7 @@ libc_fn!(unsafe opendir(path: *mut c_char) -> Result<*mut DIR> {
 });
 
 libc_fn!(unsafe readdir(dir: *mut DIR) -> Result<*const dirent> {
-    if !dir.is_null() {
-        let dir = &mut *dir;
+    if let Some(dir) = dir.as_mut() {
         let mut i = 0;
         'outer: while i < PATH_MAX - 1 {
             while dir.pos < dir.count {
@@ -60,9 +59,9 @@ libc_fn!(unsafe readdir(dir: *mut DIR) -> Result<*const dirent> {
 });
 
 libc_fn!(unsafe rewinddir(dir: *mut DIR) {
-    if !dir.is_null() {
-        (*dir).count = 0;
-        let _ = syscall::lseek(*(*dir).fd, 0, syscall::SEEK_SET);
+    if let Some(dir) = dir.as_mut() {
+        dir.count = 0;
+        let _ = syscall::lseek(*dir.fd, 0, syscall::SEEK_SET);
     }
 });
 
