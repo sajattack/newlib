@@ -130,16 +130,14 @@ libc_fn!(fsync(fd: c_int) -> Result<c_int> {
 });
 
 libc_fn!(unsafe symlink(path1: *const c_char, path2: *const c_char) -> Result<c_int> {
-    let fd = syscall::open(::cstr_to_slice(path2), syscall::O_SYMLINK | syscall::O_CREAT | syscall::O_WRONLY | 0o777)?;
-    syscall::write(fd, ::cstr_to_slice(path1))?;
-    syscall::close(fd)?;
+    let fd = ::RawFile::open(::cstr_to_slice(path2), syscall::O_SYMLINK | syscall::O_CREAT | syscall::O_WRONLY | 0o777)?;
+    syscall::write(*fd, ::cstr_to_slice(path1))?;
     Ok(0)
 });
 
 libc_fn!(unsafe readlink(path: *const c_char, buf: *const c_char, bufsize: size_t) -> Result<ssize_t> {
-    let fd = syscall::open(::cstr_to_slice(path), syscall::O_SYMLINK | syscall::O_RDONLY | syscall::O_NOFOLLOW)?;
-    let count = syscall::read(fd, slice::from_raw_parts_mut(buf as *mut u8, bufsize))?;
-    syscall::close(fd)?;
+    let fd = ::RawFile::open(::cstr_to_slice(path), syscall::O_SYMLINK | syscall::O_RDONLY)?;
+    let count = syscall::read(*fd, slice::from_raw_parts_mut(buf as *mut u8, bufsize))?;
     Ok(count as ssize_t)
 });
 

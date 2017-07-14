@@ -11,7 +11,7 @@ pub struct dirent {
 }
 
 pub struct DIR {
-    pub fd: usize,
+    pub fd: ::RawFile,
     pub ent: dirent,
     pub buf: [u8; PATH_MAX],
     pub count: usize,
@@ -20,7 +20,7 @@ pub struct DIR {
 
 libc_fn!(unsafe opendir(path: *mut c_char) -> Result<*mut DIR> {
     let path = ::cstr_to_slice(path);
-    let fd = syscall::open(path, O_RDONLY | O_CLOEXEC | O_DIRECTORY)?;
+    let fd = ::RawFile::open(path, O_RDONLY | O_CLOEXEC | O_DIRECTORY)?;
     let dir = Box::new(DIR {
         fd,
         ent: dirent { d_name: [0; PATH_MAX] },
@@ -33,8 +33,7 @@ libc_fn!(unsafe opendir(path: *mut c_char) -> Result<*mut DIR> {
 });
 
 libc_fn!(unsafe readdir(dir: *mut DIR) -> Result<*const dirent> {
-    if !dir.is_null() {
-        let dir = &mut *dir;
+    if let Some(dir) = dir.as_mut() {
         let mut i = 0;
         'outer: while i < PATH_MAX - 1 {
             while dir.pos < dir.count {
@@ -45,7 +44,7 @@ libc_fn!(unsafe readdir(dir: *mut DIR) -> Result<*const dirent> {
                 }
                 i += 1;
             }
-            dir.count = syscall::read(dir.fd, &mut dir.buf)?;
+            dir.count = syscall::read(*dir.fd, &mut dir.buf)?;
             if dir.count == 0 {
                 break;
             }
@@ -60,14 +59,13 @@ libc_fn!(unsafe readdir(dir: *mut DIR) -> Result<*const dirent> {
 });
 
 libc_fn!(unsafe rewinddir(dir: *mut DIR) {
-    if !dir.is_null() {
-        (*dir).count = 0;
-        let _ = syscall::lseek((*dir).fd, 0, syscall::SEEK_SET);
+    if let Some(dir) = dir.as_mut() {
+        dir.count = 0;
+        let _ = syscall::lseek(*dir.fd, 0, syscall::SEEK_SET);
     }
 });
 
 libc_fn!(unsafe closedir(dir: *mut DIR) -> Result<c_int> {
-    let dir = Box::from_raw(dir);
-    syscall::close(dir.fd)?;
+    Box::from_raw(dir);
     Ok(0)
 });
