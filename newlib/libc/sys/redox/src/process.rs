@@ -20,6 +20,20 @@ libc_fn!(unsafe _exit(code: c_int) {
 libc_fn!(unsafe _execve(name: *const c_char, argv: *const *const c_char, _env: *const *const c_char) -> Result<c_int> {
     // XXX Handle env
 
+    let mut env = ::environ;
+    while !(*env).is_null() {
+        let slice = ::cstr_to_slice(*env);
+        // Should always contain a =, but worth checking
+        if let Some(sep) = slice.iter().position(|&c| c == b'=') {
+            let mut path = b"env:".to_vec();
+            path.extend_from_slice(&slice[..sep]);
+            if let Ok(fd) = ::RawFile::open(&path, syscall::O_WRONLY | syscall::O_CREAT) {
+                let _ = syscall::write(*fd, &slice[sep+1..]);
+            }
+        }
+        env = env.offset(1);
+    }
+
     let mut args: Vec<[usize; 2]> = Vec::new();
     let mut arg = argv;
     while !(*arg).is_null() {
