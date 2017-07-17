@@ -54,7 +54,9 @@ libc_fn!(unsafe getcwd(buf: *mut c_char, size: size_t) -> Result<*const c_char> 
         size = ::file::PATH_MAX;
     }
     let buf = ::MallocNull::new(buf, size);
-    syscall::getcwd(slice::from_raw_parts_mut(buf.as_mut_ptr() as *mut u8, size))?;
+    let slice = slice::from_raw_parts_mut(buf.as_mut_ptr() as *mut u8, size);
+    let count = syscall::getcwd(&mut slice[..size-1])?;
+    slice[count] = b'\0';
     Ok(buf.into_raw())
     // FIXME: buffer too small
 });
