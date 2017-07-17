@@ -75,12 +75,12 @@ libc_fn!(unsafe rmdir(path: *mut c_char) -> Result<c_int> {
 
 libc_fn!(unsafe _stat(path: *const c_char, st: *mut syscall::Stat) -> Result<c_int> {
     let fd = ::RawFile::open(::cstr_to_slice(path), O_CLOEXEC | O_STAT)?;
-    Ok(_fstat(*fd as c_int, st))
+    Ok(syscall::fstat(*fd, &mut *st)? as c_int)
 });
 
 libc_fn!(unsafe lstat(path: *const c_char, st: *mut syscall::Stat) -> Result<c_int> {
     let fd = ::RawFile::open(::cstr_to_slice(path), O_CLOEXEC | O_STAT | O_NOFOLLOW)?;
-    Ok(_fstat(*fd as c_int, st))
+    Ok(syscall::fstat(*fd, &mut *st)? as c_int)
 });
 
 libc_fn!(unsafe _unlink(path: *mut c_char) -> Result<c_int> {
