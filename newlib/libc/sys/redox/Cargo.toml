@@ -11,7 +11,7 @@ lto = true
 
 [dependencies]
 byteorder = { version = "1", default-features = false }
-libc = { version = "0.2", default-features = false }
+libc = { git = "https://github.com/rust-lang/libc", default-features = false }
 redox_syscall = "0.1"
 
 [dependencies.compiler_builtins]

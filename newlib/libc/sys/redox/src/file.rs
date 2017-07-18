@@ -36,8 +36,8 @@ libc_fn!(unsafe ftruncate(file: c_int, len: off_t) -> Result<c_int> {
     Ok(syscall::ftruncate(file as usize, len as usize)? as c_int)
 });
 
-libc_fn!(unsafe _lseek(file: c_int, ptr: c_int, dir: c_int) -> Result<c_int> {
-    Ok(syscall::lseek(file as usize, ptr as isize, dir as usize)? as c_int)
+libc_fn!(unsafe _lseek(file: c_int, ptr: off_t, dir: c_int) -> Result<off_t> {
+    Ok(syscall::lseek(file as usize, ptr as isize, dir as usize)? as off_t)
 });
 
 
