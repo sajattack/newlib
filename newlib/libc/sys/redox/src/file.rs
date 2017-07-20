@@ -48,7 +48,11 @@ libc_fn!(unsafe mkdir(path: *mut c_char, mode: mode_t) -> Result<c_int> {
 });
 
 libc_fn!(unsafe _open(path: *mut c_char, flags: c_int, mode: mode_t) -> Result<c_int> {
-    let path = ::cstr_to_slice(path);
+    let mut path = ::cstr_to_slice(path);
+    // XXX hack; use better method if possible
+    if path == b"/dev/null" {
+        path = b"null:"
+    }
     Ok(syscall::open(path, flags as usize | (mode as usize & 0o777))? as c_int)
 });
 
