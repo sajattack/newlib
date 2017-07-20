@@ -11,4 +11,6 @@ struct hostent {
 
 struct hostent *gethostbyname(const char *name);
 
+#define h_addr h_addr_list[0]
+
 #endif
