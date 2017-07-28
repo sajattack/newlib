@@ -93,8 +93,8 @@ extern "C" {
 #define	F_DUPFD		0	/* Duplicate fildes */
 #define	F_GETFD		1	/* Get fildes flags (close on exec) */
 #define	F_SETFD		2	/* Set fildes flags (close on exec) */
-#define	F_GETFL		1	/* Get file flags */
-#define	F_SETFL		2	/* Set file flags */
+#define	F_GETFL		3	/* Get file flags */
+#define	F_SETFL		4	/* Set file flags */
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112
 #define	F_GETOWN 	5	/* Get owner - for ASYNC */
 #define	F_SETOWN 	6	/* Set owner - for ASYNC */
