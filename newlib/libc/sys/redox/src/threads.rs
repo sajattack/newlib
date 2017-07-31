@@ -1,10 +1,12 @@
 use syscall;
-use libc::{c_int, c_uint};
+use libc::{c_int, c_uint, c_void};
 use core::{mem, intrinsics, ptr};
 use alloc::boxed::Box;
+use alloc::BTreeMap;
 
-type pte_osThreadHandle = usize; //XXX
+type pte_osThreadHandle = usize;
 type pte_osMutexHandle = *mut i32;
+type pte_osThreadEntryPoint = unsafe extern "C" fn(params: *mut c_void) -> c_int;
 
 #[repr(C)]
 pub enum pte_osResult {
@@ -15,6 +17,9 @@ pub enum pte_osResult {
     PTE_OS_INTERRUPTED,
     PTE_OS_INVALID_PARAM
 }
+
+static mut pid_mutexes: Option<BTreeMap<pte_osThreadHandle, *mut i32>> = None;
+static mut pid_mutexes_lock: i32 = 0;
 
 use self::pte_osResult::*;
 
@@ -31,16 +36,74 @@ pte_osResult pte_osThreadCreate(pte_osThreadEntryPoint entryPoint,
                                 pte_osThreadHandle* ppte_osThreadHandle)
 */
 
-// pte_osResult pte_osThreadStart(pte_osThreadHandle osThreadHandle)
+libc_fn!(unsafe pte_osThreadCreate(entryPoint: pte_osThreadEntryPoint,
+                                   _stackSize: c_int,
+                                   _initialPriority: c_int,
+                                   argv: *mut c_void,
+                                   ppte_osThreadHandle: *mut pte_osThreadHandle
+                                   ) -> pte_osResult {
+    // XXX error handling
+    let id = syscall::clone(syscall::CLONE_VM | syscall::CLONE_FS | syscall::CLONE_FILES).unwrap();
 
-// void pte_osThreadExit()
+    let mutex = Box::into_raw(Box::new(0));
+    pte_osMutexLock(mutex);
+
+    if id == 0 {
+        // Wait until pte_osThreadStart
+        pte_osMutexLock(mutex);
+        entryPoint(argv);
+        let _ = syscall::exit(0);
+    } else {
+        pte_osMutexLock(&mut pid_mutexes_lock);
+        if pid_mutexes.is_none() {
+            pid_mutexes = Some(BTreeMap::new());
+        }
+        pid_mutexes.as_mut().unwrap().insert(id, mutex);
+        pte_osMutexUnlock(&mut pid_mutexes_lock);
+        *ppte_osThreadHandle = id;
+    }
+    PTE_OS_OK
+});
+
+// pte_osResult pte_osThreadStart(pte_osThreadHandle osThreadHandle)
+libc_fn!(unsafe pte_osThreadStart(handle: pte_osThreadHandle) -> pte_osResult {
+    let mut ret = PTE_OS_GENERAL_FAILURE;
+    pte_osMutexLock(&mut pid_mutexes_lock);
+    if let Some(ref mutexes) = pid_mutexes {
+        if let Some(mutex) = mutexes.get(&handle) {
+            pte_osMutexUnlock(*mutex);
+            ret = PTE_OS_OK;
+        }
+    }
+    pte_osMutexUnlock(&mut pid_mutexes_lock);
+    ret
+});
+
+/*
+void pte_osThreadExit()
+pte_osResult pte_osThreadExitAndDelete(pte_osThreadHandle handle)
+pte_osResult pte_osThreadDelete(pte_osThreadHandle handle)
+*/
 libc_fn!(unsafe pte_osThreadExit() {
     syscall::exit(0);
 });
 
-// pte_osResult pte_osThreadExitAndDelete(pte_osThreadHandle handle)
+libc_fn!(unsafe pte_osThreadExitAndDelete(handle: pte_osThreadHandle) -> pte_osResult {
+    pte_osThreadDelete(handle);
+    syscall::exit(0);
+    PTE_OS_OK
+});
 
-// pte_osResult pte_osThreadDelete(pte_osThreadHandle handle)
+libc_fn!(unsafe pte_osThreadDelete(handle: pte_osThreadHandle) -> pte_osResult {
+    pte_osMutexLock(&mut pid_mutexes_lock);
+    if let Some(ref mut mutexes) = pid_mutexes {
+        if let Some(mutex) = mutexes.remove(&handle) {
+            Box::from_raw(mutex);
+        }
+    }
+    pte_osMutexUnlock(&mut pid_mutexes_lock);
+    PTE_OS_OK
+});
 
 // pte_osResult pte_osThreadWaitForEnd(pte_osThreadHandle threadHandle)
 
