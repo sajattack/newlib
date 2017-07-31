@@ -1,10 +1,24 @@
 AUTOMAKE_OPTIONS = cygnus
-INCLUDES =  -I$(srcdir)/include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+INCLUDES =  -I$(srcdir)/include -I$(srcdir)/pthreads-emb $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 
 noinst_LIBRARIES = lib.a
 
-extra_objs =
+extra_objs = \
+    pthreads-emb/pthread_mutex_unlock.o \
+    pthreads-emb/pthread_mutex_init.o \
+    pthreads-emb/pthread_mutex_destroy.o \
+    pthreads-emb/pthread_mutex_lock.o \
+    pthreads-emb/pthread_mutex_timedlock.o \
+    pthreads-emb/pthread_mutex_trylock.o \
+    pthreads-emb/pthread_mutexattr_destroy.o \
+    pthreads-emb/pthread_mutexattr_getkind_np.o \
+    pthreads-emb/pthread_mutexattr_getpshared.o \
+    pthreads-emb/pthread_mutexattr_gettype.o \
+    pthreads-emb/pthread_mutexattr_init.o \
+    pthreads-emb/pthread_mutexattr_setkind_np.o \
+    pthreads-emb/pthread_mutexattr_setpshared.o \
+    pthreads-emb/pthread_mutexattr_settype.o
 
 lib_a_LIBADD = $(extra_objs)
 lib_a_SOURCES = \
@@ -41,7 +55,7 @@ lib.a: $(extra_objs) $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_red
 	rm -rf tmp
 	mkdir tmp
 	cd tmp; ar x $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a
-	$(AR) $(AR_FLAGS) $@ tmp/*.o $(extra_objs)
+	$(AR) $(AR_FLAGS) $@ tmp/*.o $(notdir $(extra_objs))
 	$(RANLIB) $@
 	rm -rf tmp
 
