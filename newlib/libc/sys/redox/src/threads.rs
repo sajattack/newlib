@@ -1,8 +1,10 @@
 use syscall;
 use libc::{c_int, c_uint};
-use core::{mem, intrinsics};
+use core::{mem, intrinsics, ptr};
+use alloc::boxed::Box;
 
 type pte_osThreadHandle = usize; //XXX
+type pte_osMutexHandle = *mut i32;
 
 #[repr(C)]
 pub enum pte_osResult {
@@ -17,6 +19,9 @@ pub enum pte_osResult {
 use self::pte_osResult::*;
 
 // pte_osResult pte_osInit(void)
+libc_fn!(unsafe pte_osInit() -> pte_osResult {
+    PTE_OS_OK
+});
 
 /*
 pte_osResult pte_osThreadCreate(pte_osThreadEntryPoint entryPoint,
@@ -54,6 +59,9 @@ libc_fn!(unsafe pte_osThreadSleep(msecs: c_uint) {
 });
 
 // pte_osThreadHandle pte_osThreadGetHandle(void)
+libc_fn!(unsafe pte_osThreadGetHandle() -> pte_osThreadHandle {
+    syscall::getpid().unwrap()
+});
 
 /*
 int pte_osThreadGetPriority(pte_osThreadHandle threadHandle)
@@ -92,6 +100,53 @@ pte_osResult pte_osMutexLock(pte_osMutexHandle handle)
 pte_osResult pte_osMutexUnlock(pte_osMutexHandle handle)
 */
 
+libc_fn!(unsafe pte_osMutexCreate(pHandle: *mut pte_osMutexHandle) -> pte_osResult {
+    *pHandle = Box::into_raw(Box::new(0));
+    PTE_OS_OK
+});
+
+libc_fn!(unsafe pte_osMutexDelete(handle: pte_osMutexHandle) -> pte_osResult {
+    Box::from_raw(handle);
+    PTE_OS_OK
+});
+
+libc_fn!(unsafe pte_osMutexLock(handle: pte_osMutexHandle) -> pte_osResult {
+    let mut c = 0;
+    for _i in 0..100 {
+        c = intrinsics::atomic_cxchg(handle, 0, 1).0;
+        if c == 0 {
+            break;
+        }
+    }
+    if c == 1 {
+        c = intrinsics::atomic_xchg(handle, 2);
+    }
+    while c != 0 {
+        let _ = syscall::futex(handle, syscall::FUTEX_WAIT, 2, 0, ptr::null_mut());
+        c = intrinsics::atomic_xchg(handle, 2);
+    }
+
+    PTE_OS_OK
+});
+
+libc_fn!(unsafe pte_osMutexUnlock(handle: pte_osMutexHandle) -> pte_osResult {
+    if *handle == 2 {
+        *handle = 0;
+    } else if intrinsics::atomic_xchg(handle, 0) == 1 {
+        return PTE_OS_OK;
+    }
+    for _i in 0..100 {
+        if *handle != 0 {
+            if intrinsics::atomic_cxchg(handle, 1, 2).0 != 0 {
+                return PTE_OS_OK;
+            }
+        }
+    }
+    let _ = syscall::futex(handle, syscall::FUTEX_WAKE, 1, 0, ptr::null_mut());
+
+    PTE_OS_OK
+});
+
 /*
 pte_osResult pte_osSemaphoreCreate(int initialValue, pte_osSemaphoreHandle *pHandle)
 pte_osResult pte_osSemaphoreDelete(pte_osSemaphoreHandle handle)
@@ -103,7 +158,6 @@ pte_osResult pte_osSemaphoreCancellablePend(pte_osSemaphoreHandle semHandle, uns
 /*
 int pte_osAtomicExchange(int *ptarg, int val)
 int pte_osAtomicCompareExchange(int *pdest, int exchange, int comp)
-int pte_osAtomicExchangeAddInt(int volatile* pAddend, int value)
 int pte_osAtomicExchangeAdd(int volatile* pAddend, int value)
 int pte_osAtomicDecrement(int *pdest)
 int pte_osAtomicIncrement(int *pdest)
@@ -115,6 +169,18 @@ libc_fn!(unsafe pte_osAtomicExchange(ptarg: *mut c_int, val: c_int) -> c_int {
 
 libc_fn!(unsafe pte_osAtomicCompareExchange(pdest: *mut c_int, exchange: c_int, comp: c_int) -> c_int {
     intrinsics::atomic_cxchg(pdest, comp, exchange).0
+});
+
+libc_fn!(unsafe pte_osAtomicExchangeAdd(pAppend: *mut c_int, value: c_int) -> c_int {
+    intrinsics::atomic_xadd(pAppend, value)
+});
+
+libc_fn!(unsafe pte_osAtomicDecrement(pdest: *mut c_int) -> c_int {
+    intrinsics::atomic_xadd(pdest, -1) - 1
+});
+
+libc_fn!(unsafe pte_osAtomicIncrement(pdest: *mut c_int) -> c_int {
+    intrinsics::atomic_xadd(pdest, 1) + 1
 });
 
 /*
