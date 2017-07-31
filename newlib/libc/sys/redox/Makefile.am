@@ -150,6 +150,7 @@ rust_sources = \
     src/hostname.rs \
     src/mallocnull.rs \
     src/rawfile.rs \
+    src/threads.rs \
     src/dns/answer.rs \
     src/dns/mod.rs \
     src/dns/query.rs

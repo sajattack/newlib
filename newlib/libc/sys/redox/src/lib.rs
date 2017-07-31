@@ -39,6 +39,7 @@ pub mod user;
 pub mod redox;
 pub mod socket;
 pub mod hostname;
+pub mod threads;
 
 pub use mallocnull::MallocNull;
 pub use rawfile::RawFile;
