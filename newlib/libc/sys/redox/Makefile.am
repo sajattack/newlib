@@ -160,14 +160,9 @@ $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a: Xargo.toml Carg
 	cd $(srcdir); CC=x86_64-elf-redox-gcc CFLAGS="$(CFLAGS) -I $(srcdir)/../../include" xargo build --target x86_64-unknown-redox --release
 
 
-lib.a: $(extra_objs) $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a
-	rm -f $@
-	rm -rf tmp
-	mkdir tmp
-	cd tmp; ar x $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a
-	$(AR) $(AR_FLAGS) $@ tmp/*.o $(notdir $(extra_objs))
-	$(RANLIB) $@
-	rm -rf tmp
+lib.a: $(srcdir)/target/x86_64-unknown-redox/release/libnewlib_redox.a $(extra_objs)
+	cp $< $@
+	ar rs $< $(notdir $(extra_objs))
 
 if MAY_SUPPLY_SYSCALLS
 all: crt0.o
