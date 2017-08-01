@@ -120,6 +120,11 @@ libc_fn!(unsafe pte_osThreadDelete(handle: pte_osThreadHandle) -> pte_osResult {
 });
 
 // pte_osResult pte_osThreadWaitForEnd(pte_osThreadHandle threadHandle)
+libc_fn!(unsafe pte_osThreadWaitForEnd(handle: pte_osThreadHandle) -> pte_osResult {
+    let mut status = 0;
+    syscall::waitpid(handle, &mut status, 0);
+    PTE_OS_OK
+});
 
 // pte_osResult pte_osThreadCancel(pte_osThreadHandle threadHandle)
 
