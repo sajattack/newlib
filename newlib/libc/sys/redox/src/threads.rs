@@ -1,11 +1,13 @@
 use syscall;
 use libc::{c_int, c_uint, c_void};
 use core::{mem, intrinsics, ptr};
+use core::sync::atomic::{AtomicUsize, ATOMIC_USIZE_INIT, Ordering};
 use alloc::boxed::Box;
 use alloc::BTreeMap;
 
 type pte_osThreadHandle = usize;
 type pte_osMutexHandle = *mut i32;
+type pte_osSemaphoreHandle = *mut i32;
 type pte_osThreadEntryPoint = unsafe extern "C" fn(params: *mut c_void) -> c_int;
 
 #[repr(C)]
@@ -18,10 +20,22 @@ pub enum pte_osResult {
     PTE_OS_INVALID_PARAM
 }
 
-static mut pid_mutexes: Option<BTreeMap<pte_osThreadHandle, *mut i32>> = None;
+use self::pte_osResult::*;
+
+static mut pid_mutexes: Option<BTreeMap<pte_osThreadHandle, pte_osMutexHandle>> = None;
 static mut pid_mutexes_lock: i32 = 0;
 
-use self::pte_osResult::*;
+#[thread_local]
+static mut LOCALS: *mut BTreeMap<c_uint, *mut c_void> = ptr::null_mut();
+
+static NEXT_KEY: AtomicUsize = ATOMIC_USIZE_INIT;
+
+unsafe fn locals() -> &'static mut BTreeMap<c_uint, *mut c_void> {
+    if LOCALS == ptr::null_mut() {
+        LOCALS = Box::into_raw(Box::new(BTreeMap::new()));
+    }
+    &mut *LOCALS
+}
 
 // pte_osResult pte_osInit(void)
 libc_fn!(unsafe pte_osInit() -> pte_osResult {
@@ -218,6 +232,16 @@ pte_osResult pte_osSemaphorePend(pte_osSemaphoreHandle handle, unsigned int *pTi
 pte_osResult pte_osSemaphoreCancellablePend(pte_osSemaphoreHandle semHandle, unsigned int *pTimeout)
 */
 
+libc_fn!(unsafe pte_osSemaphoreCreate(pHandle: *mut pte_osSemaphoreHandle) -> pte_osResult {
+    *pHandle = Box::into_raw(Box::new(0));
+    PTE_OS_OK
+});
+
+libc_fn!(unsafe pte_osSemaphoreDelete(handle: pte_osSemaphoreHandle) -> pte_osResult {
+    Box::from_raw(handle);
+    PTE_OS_OK
+});
+
 /*
 int pte_osAtomicExchange(int *ptarg, int val)
 int pte_osAtomicCompareExchange(int *pdest, int exchange, int comp)
@@ -252,3 +276,22 @@ void * pte_osTlsGetValue(unsigned int index)
 pte_osResult pte_osTlsAlloc(unsigned int *pKey)
 pte_osResult pte_osTlsFree(unsigned int index)
 */
+
+libc_fn!(unsafe pte_osTlsSetValue(index: c_uint, value: *mut c_void) -> pte_osResult {
+    locals().insert(index, value);
+    PTE_OS_OK
+});
+
+libc_fn!(unsafe pte_osTlsGetValue(index: c_uint) -> *mut c_void {
+    locals().get_mut(&index).map(|x| *x).unwrap_or(ptr::null_mut())
+});
+
+libc_fn!(unsafe pte_osTlsAlloc(pKey: *mut c_uint) -> pte_osResult {
+    NEXT_KEY.fetch_add(1, Ordering::SeqCst);
+    PTE_OS_OK
+});
+
+libc_fn!(unsafe pte_osTlsFree(index: c_uint) -> pte_osResult {
+    // XXX free keys
+    PTE_OS_OK
+});

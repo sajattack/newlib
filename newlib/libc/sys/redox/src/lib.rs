@@ -10,6 +10,7 @@
     global_allocator,
     lang_items,
     linkage,
+    thread_local,
 )]
 
 #[macro_use]
