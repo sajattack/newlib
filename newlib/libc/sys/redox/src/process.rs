@@ -17,10 +17,8 @@ libc_fn!(unsafe _exit(code: c_int) {
     syscall::exit(code as usize).unwrap();
 });
 
-libc_fn!(unsafe _execve(name: *const c_char, argv: *const *const c_char, _env: *const *const c_char) -> Result<c_int> {
-    // XXX Handle env
-
-    let mut env = ::environ;
+libc_fn!(unsafe _execve(name: *const c_char, argv: *const *const c_char, env: *const *const c_char) -> Result<c_int> {
+    let mut env = env;
     while !(*env).is_null() {
         let slice = ::cstr_to_slice(*env);
         // Should always contain a =, but worth checking
