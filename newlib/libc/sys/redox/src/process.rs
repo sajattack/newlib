@@ -12,6 +12,12 @@ libc_fn!(unsafe chdir(path: *const c_char) -> Result<c_int> {
     Ok(syscall::chdir(::cstr_to_slice(path))? as c_int)
 });
 
+libc_fn!(unsafe fchdir(fd: c_int) -> Result<c_int> {
+    let mut buf = [0; MAXPATHLEN];
+    let length = syscall::fpath(fd as usize, &mut buf)?;
+    Ok(syscall::chdir(&buf[0..length])? as c_int)
+});
+
 libc_fn!(unsafe _exit(code: c_int) {
     ::__libc_fini_array();
     syscall::exit(code as usize).unwrap();
