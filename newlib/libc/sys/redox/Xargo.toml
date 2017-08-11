@@ -1,3 +1,6 @@
 [dependencies.alloc]
 
 [dependencies.alloc_system]
+
+[dependencies.compiler_builtins]
+stage = 1
