@@ -13,3 +13,4 @@ lto = true
 byteorder = { version = "1", default-features = false }
 libc = { git = "https://github.com/rust-lang/libc", default-features = false }
 redox_syscall = "0.1"
+redox_termios = "0.1"
