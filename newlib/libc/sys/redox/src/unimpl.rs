@@ -62,6 +62,18 @@ libc_fn!(_isatty(file: c_int) -> c_int {
     (file == 0 || file == 1 || file == 2) as c_int
 });
 
+libc_fn!(ttyname(fd: c_int) -> Result<*const c_char> {
+    UNIMPL!(ttyname, EINVAL)
+});
+
+libc_fn!(fpathconf(fildes: c_int, name: c_int) -> Result<c_long> {
+    UNIMPL!(fpathconf, EINVAL)
+});
+
+libc_fn!(getlogin() -> Result<*const c_char> {
+    UNIMPL!(getlogin, EINVAL)
+});
+
 libc_fn!(unsafe select(nfds: c_int, readfds: *mut fd_set, writefds: *mut fd_set, errorfds: *mut fd_set, _timeout: *mut timeval) -> Result<c_int> {
     use ::types::{FD_SETSIZE, NFDBITS};
     let mut ret = 0;
