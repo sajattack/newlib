@@ -13,6 +13,12 @@ extern "C" {
 #include <sys/_types.h>
 #include <stddef.h>
 
+#define _POSIX_VERSION      200112L
+#define _POSIX2_VERSION     200112L
+#define _POSIX2_C_VERSION   199209L
+#define _XOPEN_VERSION      500
+#define _XOPEN_XCU_VERSION  -1
+
 extern char **environ;
 
 void	_EXFUN(_exit, (int __status ) _ATTRIBUTE ((__noreturn__)));

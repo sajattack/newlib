@@ -19,6 +19,7 @@ extern crate byteorder;
 extern crate compiler_builtins;
 extern crate libc;
 extern crate syscall;
+extern crate redox_termios;
 
 use alloc::Vec;
 use core::{ptr, mem, intrinsics, slice};
@@ -39,6 +40,7 @@ pub mod user;
 pub mod redox;
 pub mod socket;
 pub mod hostname;
+pub mod termios;
 
 pub use mallocnull::MallocNull;
 pub use rawfile::RawFile;
