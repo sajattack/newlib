@@ -154,7 +154,7 @@ libc_fn!(unsafe utime(path: *mut c_char, times: *const utimbuf) -> Result<c_int>
         [TimeSpec { tv_sec: (*times).actime, tv_nsec: 0 },
          TimeSpec { tv_sec: (*times).modtime, tv_nsec: 0 }]
     };
-    let fd = ::RawFile::open(::cstr_to_slice(path), O_WRONLY)?;
+    let fd = ::RawFile::open(::cstr_to_slice(path), 0)?;
     syscall::futimens(*fd, &times);
     Ok(0)
 });
@@ -162,7 +162,7 @@ libc_fn!(unsafe utime(path: *mut c_char, times: *const utimbuf) -> Result<c_int>
 libc_fn!(unsafe utimes(path: *mut c_char, times: *const [timeval; 2]) -> Result<c_int> {
     let times =  [TimeSpec { tv_sec: (*times)[0].tv_sec, tv_nsec: (*times)[0].tv_usec as i32 * 1000 },
                   TimeSpec { tv_sec: (*times)[1].tv_sec, tv_nsec: (*times)[0].tv_usec as i32 * 1000 }];
-    let fd = ::RawFile::open(::cstr_to_slice(path), O_WRONLY)?;
+    let fd = ::RawFile::open(::cstr_to_slice(path), 0)?;
     syscall::futimens(*fd, &times);
     Ok(0)
 });
