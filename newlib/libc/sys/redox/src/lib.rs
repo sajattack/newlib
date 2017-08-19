@@ -84,6 +84,9 @@ pub unsafe extern "C" fn __errno_location() -> *mut c_int {
     __errno()
 }
 
+#[lang = "eh_personality"]
+pub extern "C" fn eh_personality() {}
+
 #[lang = "panic_fmt"]
 #[linkage = "weak"]
 #[no_mangle]

@@ -1,7 +1,6 @@
 use ::{c_int, c_char};
 use syscall::{self, O_CLOEXEC, O_RDONLY, O_DIRECTORY};
 use core::ptr::null;
-use core::slice;
 use alloc::boxed::Box;
 use ::file::PATH_MAX;
 

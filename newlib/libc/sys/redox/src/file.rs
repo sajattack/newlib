@@ -1,7 +1,7 @@
 use syscall::{self, O_CLOEXEC, O_STAT, O_CREAT, O_EXCL, O_DIRECTORY, O_WRONLY, O_NOFOLLOW, TimeSpec};
 use core::slice;
-use libc::{c_int, c_char, off_t, mode_t, c_void, size_t, ssize_t};
-use ::types::{utimbuf, timeval, suseconds_t};
+use libc::{c_int, c_char, off_t, mode_t, size_t, ssize_t};
+use ::types::{utimbuf, timeval};
 
 pub const PATH_MAX: usize = 4096;
 
