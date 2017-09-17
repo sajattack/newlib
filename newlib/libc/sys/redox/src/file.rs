@@ -8,7 +8,7 @@ pub const PATH_MAX: usize = 4096;
 
 libc_fn!(unsafe access(path: *mut c_char, _amode: c_int) -> Result<c_int> {
     // XXX amode
-    let fd = ::RawFile::open(::cstr_to_slice(path), O_CLOEXEC | O_STAT)?;
+    ::RawFile::open(::cstr_to_slice(path), O_CLOEXEC | O_STAT)?;
     Ok(0)
 });
 
@@ -43,7 +43,7 @@ libc_fn!(unsafe _lseek(file: c_int, ptr: off_t, dir: c_int) -> Result<off_t> {
 
 libc_fn!(unsafe mkdir(path: *mut c_char, mode: mode_t) -> Result<c_int> {
     let flags = O_CREAT | O_EXCL | O_CLOEXEC | O_DIRECTORY | (mode as usize & 0o777);
-    let fd = ::RawFile::open(::cstr_to_slice(path), flags)?;
+    ::RawFile::open(::cstr_to_slice(path), flags)?;
     Ok(0)
 });
 
