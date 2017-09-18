@@ -5,6 +5,7 @@
     alloc_system,
     compiler_builtins_lib,
     const_fn,
+    const_ptr_null,
     core_intrinsics,
     drop_types_in_const,
     global_allocator,
