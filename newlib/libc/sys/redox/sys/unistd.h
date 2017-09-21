@@ -13,6 +13,12 @@ extern "C" {
 #include <sys/_types.h>
 #include <stddef.h>
 
+#define _POSIX_VERSION      200112L
+#define _POSIX2_VERSION     200112L
+#define _POSIX2_C_VERSION   199209L
+#define _XOPEN_VERSION      500
+#define _XOPEN_XCU_VERSION  -1
+
 extern char **environ;
 
 void	_EXFUN(_exit, (int __status ) _ATTRIBUTE ((__noreturn__)));
@@ -73,9 +79,7 @@ int     _EXFUN(execvpe, (const char *__file, char * const __argv[], char * const
 #if __ATFILE_VISIBLE
 int	_EXFUN(faccessat, (int __dirfd, const char *__path, int __mode, int __flags));
 #endif
-#if __BSD_VISIBLE || __XSI_VISIBLE >= 4
 int     _EXFUN(fchdir, (int __fildes));
-#endif
 int     _EXFUN(fchmod, (int __fildes, mode_t __mode ));
 #if !defined(__INSIDE_CYGWIN__)
 int     _EXFUN(fchown, (int __fildes, uid_t __owner, gid_t __group ));

@@ -5,6 +5,7 @@
     alloc_system,
     compiler_builtins_lib,
     const_fn,
+    const_ptr_null,
     core_intrinsics,
     drop_types_in_const,
     global_allocator,
@@ -20,6 +21,7 @@ extern crate byteorder;
 extern crate compiler_builtins;
 extern crate libc;
 extern crate syscall;
+extern crate redox_termios;
 
 use alloc::Vec;
 use core::{ptr, mem, intrinsics, slice};
@@ -40,6 +42,7 @@ pub mod user;
 pub mod redox;
 pub mod socket;
 pub mod hostname;
+pub mod termios;
 pub mod threads;
 
 pub use mallocnull::MallocNull;
@@ -83,6 +86,9 @@ pub fn file_read_all<T: AsRef<[u8]>>(path: T) -> syscall::Result<Vec<u8>> {
 pub unsafe extern "C" fn __errno_location() -> *mut c_int {
     __errno()
 }
+
+#[lang = "eh_personality"]
+pub extern "C" fn eh_personality() {}
 
 #[lang = "panic_fmt"]
 #[linkage = "weak"]

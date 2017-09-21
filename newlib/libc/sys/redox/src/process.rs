@@ -12,15 +12,19 @@ libc_fn!(unsafe chdir(path: *const c_char) -> Result<c_int> {
     Ok(syscall::chdir(::cstr_to_slice(path))? as c_int)
 });
 
+libc_fn!(unsafe fchdir(fd: c_int) -> Result<c_int> {
+    let mut buf = [0; MAXPATHLEN];
+    let length = syscall::fpath(fd as usize, &mut buf)?;
+    Ok(syscall::chdir(&buf[0..length])? as c_int)
+});
+
 libc_fn!(unsafe _exit(code: c_int) {
     ::__libc_fini_array();
     syscall::exit(code as usize).unwrap();
 });
 
-libc_fn!(unsafe _execve(name: *const c_char, argv: *const *const c_char, _env: *const *const c_char) -> Result<c_int> {
-    // XXX Handle env
-
-    let mut env = ::environ;
+libc_fn!(unsafe _execve(name: *const c_char, argv: *const *const c_char, env: *const *const c_char) -> Result<c_int> {
+    let mut env = env;
     while !(*env).is_null() {
         let slice = ::cstr_to_slice(*env);
         // Should always contain a =, but worth checking

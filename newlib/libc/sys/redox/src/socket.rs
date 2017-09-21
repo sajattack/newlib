@@ -104,6 +104,11 @@ libc_fn!(unsafe bind(socket: c_int, address: *const sockaddr, _address_len: sock
     Ok(0)
 });
 
+libc_fn!(unsafe listen(socket: c_int, backlog: c_int) -> Result<c_int> {
+    // TODO
+    Ok(0)
+});
+
 libc_fn!(unsafe recv(socket: c_int, buffer: *mut c_void, length: size_t, flags: c_int) -> Result<ssize_t> {
     // XXX flags
     if flags != 0 {
