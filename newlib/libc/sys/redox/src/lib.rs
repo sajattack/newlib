@@ -6,6 +6,7 @@
     compiler_builtins_lib,
     const_fn,
     const_ptr_null,
+    const_ptr_null_mut,
     core_intrinsics,
     drop_types_in_const,
     global_allocator,

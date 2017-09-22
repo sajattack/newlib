@@ -398,7 +398,7 @@ enum
         unsigned int x;             /* Extra information - reuse count etc */
       } pte_handle_t;
 
-    typedef pte_handle_t pthread_t;
+    typedef void * pthread_t;
     typedef struct pthread_attr_t_ * pthread_attr_t;
     typedef struct pthread_once_t_ pthread_once_t;
     typedef struct pthread_key_t_ * pthread_key_t;
@@ -562,7 +562,7 @@ enum
             pte_cleanup_t     _cleanup; \
             \
             pte_push_cleanup( &_cleanup, (pte_cleanup_callback_t) (_rout), (_arg) ); \
- 
+
 #define pthread_cleanup_pop( _execute ) \
             (void) pte_pop_cleanup( _execute ); \
         }

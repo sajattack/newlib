@@ -237,13 +237,32 @@ pte_osResult pte_osSemaphorePend(pte_osSemaphoreHandle handle, unsigned int *pTi
 pte_osResult pte_osSemaphoreCancellablePend(pte_osSemaphoreHandle semHandle, unsigned int *pTimeout)
 */
 
-libc_fn!(unsafe pte_osSemaphoreCreate(pHandle: *mut pte_osSemaphoreHandle) -> pte_osResult {
-    *pHandle = Box::into_raw(Box::new(0));
+libc_fn!(unsafe pte_osSemaphoreCreate(initialValue: c_int, pHandle: *mut pte_osSemaphoreHandle) -> pte_osResult {
+    *pHandle = Box::into_raw(Box::new(initialValue));
     PTE_OS_OK
 });
 
 libc_fn!(unsafe pte_osSemaphoreDelete(handle: pte_osSemaphoreHandle) -> pte_osResult {
     Box::from_raw(handle);
+    PTE_OS_OK
+});
+
+libc_fn!(unsafe pte_osSemaphorePost(handle: pte_osSemaphoreHandle, count: c_int) -> pte_osResult {
+    if intrinsics::atomic_xadd(handle, 1) <= 0 {
+        while match syscall::futex(handle, syscall::FUTEX_WAKE, 1, 0, ptr::null_mut()) {
+            Ok(waiters) => waiters < 1,
+            Err(err) => return PTE_OS_GENERAL_FAILURE,
+        } {
+            syscall::sched_yield();
+        }
+    }
+    PTE_OS_OK
+});
+
+libc_fn!(unsafe pte_osSemaphorePend(handle: pte_osSemaphoreHandle, pTimeout: *mut c_uint) -> pte_osResult {
+    if intrinsics::atomic_xsub(handle, 1) < 0 {
+        let _ = syscall::futex(handle, syscall::FUTEX_WAIT, *handle, 0, ptr::null_mut());
+    }
     PTE_OS_OK
 });
 
