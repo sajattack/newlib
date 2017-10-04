@@ -19,7 +19,6 @@
 extern crate alloc;
 extern crate alloc_system;
 extern crate byteorder;
-extern crate compiler_builtins;
 extern crate libc;
 extern crate syscall;
 extern crate redox_termios;
