@@ -43,6 +43,7 @@ typedef unsigned int   tcflag_t;
 #define ICRNL  000400
 #define IXON   001000
 #define IXOFF  002000
+#define IXANY  004000
 
 // flags for output modes
 #define OPOST  000001
