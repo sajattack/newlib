@@ -5,9 +5,12 @@
 
 #define AF_UNSPEC 0
 #define AF_INET 2
+#define AF_UNIX 1
+#define AF_MAX 26
 
 #define PF_UNSPEC 0
 #define PF_INET 2
+#define PF_UNIX AF_UNIX
 
 #define SOCK_STREAM 1
 #define SOCK_DGRAM 2
