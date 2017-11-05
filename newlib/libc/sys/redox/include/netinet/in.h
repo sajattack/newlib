@@ -9,6 +9,7 @@
 #define	IPPROTO_ICMP 1
 #define	IPPROTO_TCP 6
 #define	IPPROTO_UDP 17
+#define IPPORT_RESERVED 1024
 
 #define INADDR_ANY ((in_addr_t) 0x00000000)
 #define INADDR_BROADCAST ((in_addr_t) 0xffffffff)
