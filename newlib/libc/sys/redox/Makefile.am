@@ -48,3 +48,7 @@ include $(srcdir)/../../../Makefile.shared
 install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/arpa;
 	$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/netinet;
+	$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/gnu
+	$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/bits;
+	$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/bits/types;
+	
