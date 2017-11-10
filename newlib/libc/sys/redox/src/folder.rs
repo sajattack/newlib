@@ -88,3 +88,7 @@ libc_fn!(unsafe closedir(dir: *mut DIR) -> Result<c_int> {
     Box::from_raw(dir);
     Ok(0)
 });
+
+libc_fn!(unsafe dirfd(dir: *mut DIR) -> Result<c_int> {
+    Ok(*(*dir).fd as i32)
+});

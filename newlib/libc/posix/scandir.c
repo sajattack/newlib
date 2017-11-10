@@ -90,7 +90,7 @@ _DEFUN(scandir, (dirname, namelist, select, dcomp),
 #ifdef HAVE_DD_LOCK
 	__lock_acquire_recursive(dirp->dd_lock);
 #endif
-	if (fstat(dirp->dd_fd, &stb) < 0)
+	if (fstat(dirfd(dirp), &stb) < 0)
 		goto cleanup;
 
 	/*
@@ -131,7 +131,7 @@ _DEFUN(scandir, (dirname, namelist, select, dcomp),
 		 * realloc the maximum size.
 		 */
 		if (++nitems >= arraysz) {
-			if (fstat(dirp->dd_fd, &stb) < 0)
+			if (fstat(dirfd(dirp), &stb) < 0)
 				goto cleanup;
 			arraysz = stb.st_size / 12;
 			names = (struct dirent **)reallocf((char *)names,
