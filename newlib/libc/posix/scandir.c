@@ -1,4 +1,4 @@
-#ifndef HAVE_OPENDIR
+//#ifndef HAVE_OPENDIR
 
 /*
  * Copyright (c) 1983 Regents of the University of California.
@@ -176,4 +176,4 @@ _DEFUN(alphasort, (d1, d2),
        return(strcmp((*d1)->d_name, (*d2)->d_name));
 }
 
-#endif /* ! HAVE_OPENDIR */
+//#endif /* ! HAVE_OPENDIR */

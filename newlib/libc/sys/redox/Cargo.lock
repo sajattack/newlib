@@ -1,4 +1,19 @@
-[root]
+[[package]]
+name = "byteorder"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "compiler_builtins"
+version = "0.1.0"
+source = "git+https://github.com/rust-lang-nursery/compiler-builtins#1be2858df7810b0cea8e794144d465dad1e6b9d7"
+
+[[package]]
+name = "libc"
+version = "0.2.30"
+source = "git+https://github.com/redox-os/liblibc#d18565cf6fbfedaa12b7d0046f50e73d7aa5343e"
+
+[[package]]
 name = "newlib_redox"
 version = "0.1.0"
 dependencies = [
@@ -8,21 +23,6 @@ dependencies = [
  "redox_syscall 0.1.31 (registry+https://github.com/rust-lang/crates.io-index)",
  "redox_termios 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
-
-[[package]]
-name = "byteorder"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-
-[[package]]
-name = "compiler_builtins"
-version = "0.1.0"
-source = "git+https://github.com/rust-lang-nursery/compiler-builtins#4d9df62fb76969eb2c38897ac57ff70f29d52c59"
-
-[[package]]
-name = "libc"
-version = "0.2.30"
-source = "git+https://github.com/redox-os/liblibc#75b5c293322bf2dace86e14a4296095fc4f47752"
 
 [[package]]
 name = "redox_syscall"
