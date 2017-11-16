@@ -54,7 +54,7 @@ fn lookup_host(host: &str) -> Result<LookupHost> {
 
         let packet_data = packet.compile();
 
-        let fd = ::RawFile::open(format!("udp:{}.{}.{}.{}:0",
+        let fd = ::RawFile::open(format!("udp:/{}.{}.{}.{}:0",
                                          ip[0], ip[1], ip[2], ip[3]).as_bytes(),
                                  syscall::O_RDWR)?;
 
