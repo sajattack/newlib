@@ -27,6 +27,10 @@ struct sockaddr {
     char sa_data[14];
 };
 
+stuct sockaddr_storage {
+    sa_family_t ss_family;
+};
+
 int connect(int socket, const struct sockaddr *address, socklen_t address_len);
 ssize_t recv(int socket, void *buffer, size_t length, int flags);
 ssize_t send(int socket, const void *buffer, size_t length, int flags);
