@@ -1,4 +1,4 @@
-#ifndef HAVE_OPENDIR
+//#ifndef HAVE_OPENDIR
 
 /*
  * Copyright (c) 1983 Regents of the University of California.
@@ -90,7 +90,7 @@ _DEFUN(scandir, (dirname, namelist, select, dcomp),
 #ifdef HAVE_DD_LOCK
 	__lock_acquire_recursive(dirp->dd_lock);
 #endif
-	if (fstat(dirp->dd_fd, &stb) < 0)
+	if (fstat(dirfd(dirp), &stb) < 0)
 		goto cleanup;
 
 	/*
@@ -131,7 +131,7 @@ _DEFUN(scandir, (dirname, namelist, select, dcomp),
 		 * realloc the maximum size.
 		 */
 		if (++nitems >= arraysz) {
-			if (fstat(dirp->dd_fd, &stb) < 0)
+			if (fstat(dirfd(dirp), &stb) < 0)
 				goto cleanup;
 			arraysz = stb.st_size / 12;
 			names = (struct dirent **)reallocf((char *)names,
@@ -176,4 +176,4 @@ _DEFUN(alphasort, (d1, d2),
        return(strcmp((*d1)->d_name, (*d2)->d_name));
 }
 
-#endif /* ! HAVE_OPENDIR */
+//#endif /* ! HAVE_OPENDIR */

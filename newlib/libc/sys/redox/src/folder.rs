@@ -1,12 +1,32 @@
+extern crate libc;
+extern crate core;
 use ::{c_int, c_char};
 use syscall::{self, O_CLOEXEC, O_RDONLY, O_DIRECTORY};
 use core::ptr::null;
+use core::default::Default;
 use alloc::boxed::Box;
 use ::file::PATH_MAX;
+use ::types::{ino_t, off_t};
+use libc::*;
 
 #[repr(C)]
 pub struct dirent {
-    pub d_name: [c_char; PATH_MAX],
+    pub d_ino: ino_t,
+    pub d_off: off_t,
+    pub d_reclen: c_ushort,
+    pub d_type: c_uchar,
+    pub d_name: [c_char; PATH_MAX]
+}
+impl core::default::Default for dirent {
+    fn default() -> dirent {
+        dirent {
+            d_ino: 0,
+            d_off: 0,
+            d_reclen: 0,
+            d_type: 0,
+            d_name: [0; PATH_MAX],
+        }
+    }
 }
 
 pub struct DIR {
@@ -22,7 +42,7 @@ libc_fn!(unsafe opendir(path: *mut c_char) -> Result<*mut DIR> {
     let fd = ::RawFile::open(path, O_RDONLY | O_CLOEXEC | O_DIRECTORY)?;
     let dir = Box::new(DIR {
         fd,
-        ent: dirent { d_name: [0; PATH_MAX] },
+        ent: dirent::default(),
         buf: [0; PATH_MAX],
         count: 0,
         pos: 0
@@ -67,4 +87,8 @@ libc_fn!(unsafe rewinddir(dir: *mut DIR) {
 libc_fn!(unsafe closedir(dir: *mut DIR) -> Result<c_int> {
     Box::from_raw(dir);
     Ok(0)
+});
+
+libc_fn!(unsafe dirfd(dir: *mut DIR) -> Result<c_int> {
+    Ok(*(*dir).fd as i32)
 });
