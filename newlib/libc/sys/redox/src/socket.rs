@@ -104,7 +104,7 @@ libc_fn!(unsafe bind(socket: c_int, address: *const sockaddr, _address_len: sock
     Ok(0)
 });
 
-libc_fn!(unsafe listen(socket: c_int, backlog: c_int) -> Result<c_int> {
+libc_fn!(unsafe listen(_socket: c_int, _backlog: c_int) -> Result<c_int> {
     // TODO
     Ok(0)
 });
@@ -128,7 +128,7 @@ libc_fn!(unsafe send(socket: c_int, buffer: *const c_void, length: size_t, flags
     }
 });
 
-libc_fn!(unsafe recvfrom(socket: c_int, buffer: *mut c_void, length: size_t, flags: c_int, address: *const sockaddr, _address_len: *const socklen_t) -> Result<ssize_t>  {
+libc_fn!(unsafe recvfrom(socket: c_int, buffer: *mut c_void, length: size_t, flags: c_int, _address: *const sockaddr, _address_len: *const socklen_t) -> Result<ssize_t>  {
     let fd = syscall::dup(socket as usize, b"listen")?;
     let mut path = [0; 4096];
     syscall::fpath(socket as usize, &mut path)?;

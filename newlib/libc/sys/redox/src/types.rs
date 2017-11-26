@@ -83,6 +83,20 @@ pub struct fd_set {
     pub fds_bits: [fd_mask; (FD_SETSIZE + NFDBITS - 1) / NFDBITS]
 }
 
+pub const POLLIN: libc::c_short = 0x0001;
+pub const POLLPRI: libc::c_short = 0x0002;
+pub const POLLOUT: libc::c_short = 0x0004;
+pub const POLLERR: libc::c_short = 0x0008;
+pub const POLLHUP: libc::c_short = 0x0010;
+pub const POLLNVAL: libc::c_short = 0x0020;
+
+#[repr(C)]
+pub struct pollfd {
+    pub fd: libc::c_int,
+    pub events: libc::c_short,
+    pub revents: libc::c_short,
+}
+
 #[repr(C)]
 pub struct passwd {
     pub pw_name: *const libc::c_char,

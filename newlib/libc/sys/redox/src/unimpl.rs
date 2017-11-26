@@ -1,6 +1,5 @@
 use syscall;
 use libc::{c_uint, c_int, c_char, gid_t, uid_t, c_void, c_long, mode_t};
-use ::types::{timeval, fd_set};
 use syscall::error::{Error, EACCES, EPERM, EINVAL};
 
 #[allow(non_camel_case_types)]
@@ -54,10 +53,6 @@ libc_fn!(umask(_mode: mode_t) -> mode_t {
     0o000
 });
 
-libc_fn!(unsafe vfork() -> c_int {
-    ::process::_fork()
-});
-
 libc_fn!(ttyname(_fd: c_int) -> Result<*const c_char> {
     UNIMPL!(ttyname, EINVAL)
 });
@@ -68,28 +63,4 @@ libc_fn!(fpathconf(_fildes: c_int, _name: c_int) -> Result<c_long> {
 
 libc_fn!(getlogin() -> Result<*const c_char> {
     UNIMPL!(getlogin, EINVAL)
-});
-
-libc_fn!(unsafe select(_nfds: c_int, readfds: *mut fd_set, writefds: *mut fd_set, errorfds: *mut fd_set, _timeout: *mut timeval) -> Result<c_int> {
-    use ::types::{FD_SETSIZE, NFDBITS};
-    let mut ret = 0;
-    syscall::write(2, b"unimplemented: select()\n").unwrap();
-    if !readfds.is_null() {
-        for i in 0..FD_SETSIZE {
-             if ((*readfds).fds_bits[i/NFDBITS] & (1 << (i % NFDBITS))) != 0 {
-                 ret += 1;
-             }
-        }
-    }
-    if !writefds.is_null() {
-        for i in 0..FD_SETSIZE {
-             if ((*writefds).fds_bits[i/NFDBITS] & (1 << (i % NFDBITS))) != 0 {
-                 ret += 1;
-             }
-        }
-    }
-    if !errorfds.is_null() {
-        (*errorfds).fds_bits = [0; (FD_SETSIZE + NFDBITS - 1) / NFDBITS];
-    }
-    Ok(ret)
 });

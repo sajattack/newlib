@@ -7,7 +7,6 @@
     const_fn,
     const_ptr_null,
     core_intrinsics,
-    drop_types_in_const,
     global_allocator,
     lang_items,
     linkage,
@@ -32,6 +31,7 @@ mod types;
 mod dns;
 mod mallocnull;
 mod rawfile;
+pub mod event;
 pub mod process;
 pub mod file;
 pub mod folder;

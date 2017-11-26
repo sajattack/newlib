@@ -103,7 +103,7 @@ libc_fn!(unsafe chmod(path: *mut c_char, mode: mode_t) -> Result<c_int> {
 libc_fn!(unsafe realpath(path: *const c_char, resolved_path: *mut c_char) -> Result<*mut c_char> {
     let fd = ::RawFile::open(::cstr_to_slice(path), O_STAT)?;
 
-    let mut resolved_path = ::MallocNull::new(resolved_path, PATH_MAX);
+    let resolved_path = ::MallocNull::new(resolved_path, PATH_MAX);
     let buf = slice::from_raw_parts_mut(resolved_path.as_mut_ptr() as *mut u8, PATH_MAX-1);
     let length = syscall::fpath(*fd, buf)?;
     buf[length] = b'\0';
@@ -155,7 +155,7 @@ libc_fn!(unsafe utime(path: *mut c_char, times: *const utimbuf) -> Result<c_int>
          TimeSpec { tv_sec: (*times).modtime, tv_nsec: 0 }]
     };
     let fd = ::RawFile::open(::cstr_to_slice(path), 0)?;
-    syscall::futimens(*fd, &times);
+    syscall::futimens(*fd, &times)?;
     Ok(0)
 });
 
@@ -163,7 +163,7 @@ libc_fn!(unsafe utimes(path: *mut c_char, times: *const [timeval; 2]) -> Result<
     let times =  [TimeSpec { tv_sec: (*times)[0].tv_sec, tv_nsec: (*times)[0].tv_usec as i32 * 1000 },
                   TimeSpec { tv_sec: (*times)[1].tv_sec, tv_nsec: (*times)[0].tv_usec as i32 * 1000 }];
     let fd = ::RawFile::open(::cstr_to_slice(path), 0)?;
-    syscall::futimens(*fd, &times);
+    syscall::futimens(*fd, &times)?;
     Ok(0)
 });
 

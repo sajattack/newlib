@@ -52,6 +52,10 @@ libc_fn!(unsafe _fork() -> Result<c_int> {
     Ok(syscall::clone(0)? as c_int)
 });
 
+libc_fn!(unsafe vfork() -> Result<c_int> {
+    Ok(syscall::clone(syscall::CLONE_VFORK)? as c_int)
+});
+
 libc_fn!(unsafe getcwd(buf: *mut c_char, size: size_t) -> Result<*const c_char> {
     let mut size = size;
     if size == 0 {

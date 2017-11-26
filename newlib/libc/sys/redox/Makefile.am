@@ -14,6 +14,7 @@ lib_a_CFLAGS = $(AM_CFLAGS)
 rust_sources = \
     src/lib.rs \
     src/macros.rs \
+    src/event.rs \
     src/process.rs \
     src/file.rs \
     src/time.rs \
