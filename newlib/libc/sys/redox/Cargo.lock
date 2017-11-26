@@ -6,7 +6,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "compiler_builtins"
 version = "0.1.0"
-source = "git+https://github.com/rust-lang-nursery/compiler-builtins#02b3734a5ba6de984eb5a02c50860cc014e58d56"
+source = "git+https://github.com/rust-lang-nursery/compiler-builtins#60d949ba1d10bf9d3dd940c3307d82d6f2d33c8b"
 
 [[package]]
 name = "libc"
