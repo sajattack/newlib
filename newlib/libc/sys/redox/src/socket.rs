@@ -20,8 +20,8 @@ libc_fn!(unsafe inet_aton(cp: *const c_char, inp: *mut in_addr) -> c_int {
     inet_pton(AF_INET, cp, inp as *mut c_void)
 });
 
-libc_fn!(unsafe inet_ntoa(inp: *const in_addr) -> *const c_char {
-    inet_ntop(AF_INET, inp as *const c_void, NTOA_ADDR.as_mut_ptr(), 16)
+libc_fn!(unsafe inet_ntoa(addr: in_addr) -> *const c_char {
+    inet_ntop(AF_INET, &addr as *const in_addr as *const c_void, NTOA_ADDR.as_mut_ptr(), 16)
 });
 
 libc_fn!(unsafe inet_pton(domain: c_int, src: *const c_char, dest: *mut c_void) -> Result<c_int> {
