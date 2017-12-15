@@ -184,7 +184,7 @@ fn lookup_host(host: &str) -> Result<LookupHost> {
         let packet_data = packet.compile();
 
         let fd = ::RawFile::open(
-            format!("udp:{}.{}.{}.{}:0", ip[0], ip[1], ip[2], ip[3]).as_bytes(),
+            format!("udp:/{}.{}.{}.{}:0", ip[0], ip[1], ip[2], ip[3]).as_bytes(),
             syscall::O_RDWR,
         )?;
 
@@ -236,7 +236,7 @@ fn lookup_host(host: &str) -> Result<LookupHost> {
     }
 }
 
-unsafe fn lookup_addr(addr: *const in_addr) -> Result<LookupAddr> {
+unsafe fn lookup_addr(addr: in_addr) -> Result<LookupAddr> {
     // XXX better error handling
     let ip_string = String::from_utf8(::file_read_all("/etc/net/ip")?).or(Err(
         Error::new(syscall::EIO),
@@ -287,7 +287,7 @@ unsafe fn lookup_addr(addr: *const in_addr) -> Result<LookupAddr> {
         let packet_data = packet.compile();
 
         let fd = ::RawFile::open(
-            format!("udp:{}.{}.{}.{}:0", ip[0], ip[1], ip[2], ip[3]).as_bytes(),
+            format!("udp:/{}.{}.{}.{}:0", ip[0], ip[1], ip[2], ip[3]).as_bytes(),
             syscall::O_RDWR,
         )?;
 
@@ -363,7 +363,7 @@ libc_fn!(unsafe endservent() {
 libc_fn!(unsafe gethostbyaddr(v: *const libc::c_void, length: socklen_t, format: libc::c_int) -> Result <*const hostent> {
     let mut addr = mem::uninitialized(); 
     ::socket::inet_aton(['8' as i8, '.' as i8, '8' as i8, '.' as i8, '4' as i8, '.' as i8, '4' as i8, '\0' as i8].as_ptr(), &mut addr);
-    match lookup_addr(&addr) {
+    match lookup_addr(addr) {
         Ok(s) => Ok(&HOST_ENTRY),
         Err(err) => Err(err),
     }
