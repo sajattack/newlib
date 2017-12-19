@@ -309,8 +309,6 @@ unsafe fn lookup_addr(addr: in_addr) -> Result<Vec<Vec<u8>>> {
                     if answer.a_type == 0x000C && answer.a_class == 0x0001 
                     {
                         names.push(answer.data.clone());
-                        let _ = syscall::write(2, answer.data.as_slice());
-                        let _ = syscall::write(2, "\n".as_bytes());
                     }
                 }
                 Ok(names)
