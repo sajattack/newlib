@@ -247,13 +247,21 @@ unsafe fn lookup_addr(addr: in_addr) -> Result<Vec<Vec<u8>>> {
         .map(|part| part.parse::<u8>().unwrap_or(0))
         .collect();
     
-    let addr_cstr = ::socket::inet_ntoa(addr);
-    let addr = ::cstr_to_slice(addr_cstr).to_vec();
-    let mut name = addr.clone();
-    name.reverse();
-    for ch in b".IN-ADDR.ARPA"{
+    let mut addr_vec: Vec<u8> = addr.s_addr.to_vec(); 
+    addr_vec.reverse();
+    let mut name: Vec<u8> = vec![]; 
+    for octet in addr_vec {
+        for ch in format!("{}", octet).as_bytes() {
+            name.push(*ch);
+        }
+        name.push(b"."[0]);
+    }
+    name.pop();
+    for ch in b".IN-ADDR.ARPA" {
         name.push(*ch);
     }
+    let _ = syscall::write(2, name.as_slice());
+    let _ = syscall::write(2, "\n".as_bytes());
 
     if ip.len() == 4 && dns.len() == 4 {
         let mut timespec = syscall::TimeSpec::default();
@@ -303,12 +311,22 @@ unsafe fn lookup_addr(addr: in_addr) -> Result<Vec<Vec<u8>>> {
 
         match Dns::parse(&buf[..count]) {
             Ok(response) => {
+                let _ = syscall::write(2, format!("{:?}", response).as_bytes());
+                let _ = syscall::write(2, "\n".as_bytes());
                 let mut names = vec![];
                 for answer in response.answers.iter() {
      
                     if answer.a_type == 0x000C && answer.a_class == 0x0001 
                     {
-                        names.push(answer.data.clone());
+                        // replace weird ascii chars with periods
+                        let mut data = answer.data.clone();
+                        let end = data.len() -1;
+                        for (i,ch) in data.iter_mut().enumerate() {
+                            if *ch < 32 && i != 0 && i != end {
+                                *ch = 46;
+                            }
+                        }
+                        names.push(data);
                     }
                 }
                 Ok(names)
@@ -348,8 +366,8 @@ libc_fn!(unsafe gethostbyaddr(v: *const libc::c_void, length: socklen_t, format:
             HOST_ENTRY = hostent {
                 h_name: host_name.as_ptr() as *const c_char,
                 h_aliases: [null();2].as_mut_ptr(),
-                h_addrtype: ::socket::AF_INET,
-                h_length: 4,
+                h_addrtype: format,
+                h_length: length as i32,
                 h_addr_list: HOST_ADDR_LIST.as_ptr()
             };
             HOST_NAME = Some(host_name);
