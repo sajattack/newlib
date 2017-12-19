@@ -24,15 +24,6 @@ impl Iterator for LookupHost {
     }
 }
 
-struct LookupAddr(IntoIter<[u8;11]>);
-
-impl Iterator for LookupAddr {
-    type Item = [u8;11];
-    fn next(&mut self) -> Option<Self::Item> {
-        self.0.next()
-    }
-}
-
 #[repr(C)]
 pub struct hostent {
     h_name: *const libc::c_char,
@@ -236,7 +227,7 @@ fn lookup_host(host: &str) -> Result<LookupHost> {
     }
 }
 
-unsafe fn lookup_addr(addr: in_addr) -> Result<LookupAddr> {
+unsafe fn lookup_addr(addr: in_addr) -> Result<Vec<Vec<u8>>> {
     // XXX better error handling
     let ip_string = String::from_utf8(::file_read_all("/etc/net/ip")?).or(Err(
         Error::new(syscall::EIO),
@@ -263,8 +254,6 @@ unsafe fn lookup_addr(addr: in_addr) -> Result<LookupAddr> {
     for ch in b".IN-ADDR.ARPA"{
         name.push(*ch);
     }
-     let _ = syscall::write(2, name.as_slice());
-     let _ = syscall::write(2, "\n".as_bytes());
 
     if ip.len() == 4 && dns.len() == 4 {
         let mut timespec = syscall::TimeSpec::default();
@@ -312,27 +301,19 @@ unsafe fn lookup_addr(addr: in_addr) -> Result<LookupAddr> {
         drop(sendrecvfd);
         drop(fd);
 
-        //never gets to here
-        let _ = syscall::write(2, "hello world\n".as_bytes());
-
         match Dns::parse(&buf[..count]) {
             Ok(response) => {
-                let _ = syscall::write(2, format!("{:?}", response).as_bytes());
-                let _ = syscall::write(2, "\n".as_bytes());
                 let mut names = vec![];
                 for answer in response.answers.iter() {
-                    let _ = syscall::write(2, format!("{:?}", answer).as_bytes());
-                    let _ = syscall::write(2, "\n".as_bytes());
-
-                    let _ = syscall::write(2, answer.data.as_slice());
-                    let _ = syscall::write(2, "\n".as_bytes());
-                    if answer.a_type == 0x0001 && answer.a_class == 0x0001 
+     
+                    if answer.a_type == 0x000C && answer.a_class == 0x0001 
                     {
+                        names.push(answer.data.clone());
                         let _ = syscall::write(2, answer.data.as_slice());
                         let _ = syscall::write(2, "\n".as_bytes());
                     }
                 }
-                Ok(LookupAddr(names.into_iter()))
+                Ok(names)
             }
             Err(_err) => Err(Error::new(EINVAL)),
         }
@@ -361,11 +342,22 @@ libc_fn!(unsafe endservent() {
 
 
 libc_fn!(unsafe gethostbyaddr(v: *const libc::c_void, length: socklen_t, format: libc::c_int) -> Result <*const hostent> {
-    let mut addr = mem::uninitialized(); 
-    ::socket::inet_aton(['8' as i8, '.' as i8, '8' as i8, '.' as i8, '4' as i8, '.' as i8, '4' as i8, '\0' as i8].as_ptr(), &mut addr);
+    let mut addr: in_addr = *(v as *mut in_addr);
     match lookup_addr(addr) {
-        Ok(s) => Ok(&HOST_ENTRY),
-        Err(err) => Err(err),
+        Ok(s) => {
+            HOST_ADDR_LIST = [addr.s_addr.as_mut_ptr() as *const c_char, null()];
+            let host_name = s[0].to_vec();
+            HOST_ENTRY = hostent {
+                h_name: host_name.as_ptr() as *const c_char,
+                h_aliases: [null();2].as_mut_ptr(),
+                h_addrtype: ::socket::AF_INET,
+                h_length: 4,
+                h_addr_list: HOST_ADDR_LIST.as_ptr()
+            };
+            HOST_NAME = Some(host_name);
+            return Ok(&HOST_ENTRY)
+        }
+        Err(err) => Err(err)
     }
 });
 

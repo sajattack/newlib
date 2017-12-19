@@ -44,7 +44,7 @@ struct addrinfo {
 };
 
 struct hostent *gethostbyname(const char *name);
-struct hostent *gethostbyaddr(const void v, socklen_t length, int format);
+struct hostent *gethostbyaddr(const void *v, socklen_t length, int format);
 struct hostent *gethostent();
 struct protoent *getprotobyname(const char *name);
 struct protoent *getprotobynumber(int number);

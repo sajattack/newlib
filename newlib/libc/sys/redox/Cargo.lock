@@ -1,12 +1,12 @@
 [[package]]
 name = "byteorder"
-version = "1.1.0"
+version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "compiler_builtins"
 version = "0.1.0"
-source = "git+https://github.com/rust-lang-nursery/compiler-builtins#200c94eebf3705fa9590451f5a9e8c3fb94d7323"
+source = "git+https://github.com/rust-lang-nursery/compiler-builtins#0633d73c55b210d326e0109453d86c7515ea295d"
 
 [[package]]
 name = "libc"
@@ -17,7 +17,7 @@ source = "git+https://github.com/redox-os/liblibc#d18565cf6fbfedaa12b7d0046f50e7
 name = "newlib_redox"
 version = "0.1.0"
 dependencies = [
- "byteorder 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "byteorder 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "compiler_builtins 0.1.0 (git+https://github.com/rust-lang-nursery/compiler-builtins)",
  "libc 0.2.30 (git+https://github.com/redox-os/liblibc)",
  "redox_syscall 0.1.32 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -38,7 +38,7 @@ dependencies = [
 ]
 
 [metadata]
-"checksum byteorder 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ff81738b726f5d099632ceaffe7fb65b90212e8dce59d518729e7e8634032d3d"
+"checksum byteorder 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "652805b7e73fada9d85e9a6682a4abd490cb52d96aeecc12e33a0de34dfd0d23"
 "checksum compiler_builtins 0.1.0 (git+https://github.com/rust-lang-nursery/compiler-builtins)" = "<none>"
 "checksum libc 0.2.30 (git+https://github.com/redox-os/liblibc)" = "<none>"
 "checksum redox_syscall 0.1.32 (registry+https://github.com/rust-lang/crates.io-index)" = "ab105df655884ede59d45b7070c8a65002d921461ee813a024558ca16030eea0"
