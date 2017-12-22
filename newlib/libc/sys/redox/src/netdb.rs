@@ -33,13 +33,15 @@ pub struct hostent {
     h_addr_list: *const *const libc::c_char,
 }
 
-#[repr(C)]
-pub struct netent {
-    n_name: *const libc::c_char, /* official name of net */
-    n_aliases: *const *const libc::c_char, /* alias list */
-    n_addrtype: libc::c_int, /* net address type */
-    n_net: libc::c_ulong, /* network # */
-}
+/*
+ *#[repr(C)]
+ *pub struct netent {
+ *    n_name: *const libc::c_char, [> official name of net <]
+ *    n_aliases: *const *const libc::c_char, [> alias list <]
+ *    n_addrtype: libc::c_int, [> net address type <]
+ *    n_net: libc::c_ulong, [> network # <]
+ *}
+ */
 
 #[repr(C)]
 pub struct servent {
@@ -69,19 +71,21 @@ pub struct addrinfo {
 }
 
 static mut HOSTDB: usize = 0;
-static mut NETDB: usize = 0;
+//static mut NETDB: usize = 0;
 static mut PROTODB: usize = 0;
 static mut SERVDB: usize = 0;
 
-static mut NET_ENTRY: netent = netent {
-    n_name: 0 as *const libc::c_char,
-    n_aliases: 0 as *const *const libc::c_char,
-    n_addrtype: 0,
-    n_net: 0 as u64,
-};
-static mut NET_NAME: Option<Vec<u8>> = None;
-static mut NET_ALIASES: [*const c_char; MAXALIASES] = [null(); MAXALIASES];
-static mut NET_NUM: Option<u64> = None;
+/*
+ *static mut NET_ENTRY: netent = netent {
+ *    n_name: 0 as *const libc::c_char,
+ *    n_aliases: 0 as *const *const libc::c_char,
+ *    n_addrtype: 0,
+ *    n_net: 0 as u64,
+ *};
+ *static mut NET_NAME: Option<Vec<u8>> = None;
+ *static mut NET_ALIASES: [*const c_char; MAXALIASES] = [null(); MAXALIASES];
+ *static mut NET_NUM: Option<u64> = None;
+ */
 
 static mut HOST_ENTRY: hostent = hostent {
     h_name: 0 as *const libc::c_char,
@@ -344,9 +348,11 @@ libc_fn!(unsafe endhostent() {
     let _ = syscall::close(HOSTDB);
 });
 
-libc_fn!(unsafe endnetent()  {
-    let _ = syscall::close(NETDB);
-});
+/*
+ *libc_fn!(unsafe endnetent()  {
+ *    let _ = syscall::close(NETDB);
+ *});
+ */
 
 libc_fn!(unsafe endprotoent() {
     let _ = syscall::close(PROTODB);
@@ -664,13 +670,15 @@ libc_fn!(unsafe sethostent(stayopen: libc::c_int)  {
     H_LINE = RawLineBuffer::new(HOSTDB);
 });
 
-libc_fn!(unsafe setnetent(stayopen: libc::c_int)  {
-    if NETDB == 0 {
-        NETDB = syscall::open("/etc/networks", syscall::O_RDONLY).unwrap();
-    } else {
-        let _ = syscall::lseek(NETDB, 0, syscall::SEEK_SET);
-    }
-});
+/*
+ *libc_fn!(unsafe setnetent(stayopen: libc::c_int)  {
+ *    if NETDB == 0 {
+ *        NETDB = syscall::open("/etc/networks", syscall::O_RDONLY).unwrap();
+ *    } else {
+ *        let _ = syscall::lseek(NETDB, 0, syscall::SEEK_SET);
+ *    }
+ *});
+ */
 
 libc_fn!(unsafe setprotoent(stayopen: libc::c_int)  {
     if PROTODB == 0 {
