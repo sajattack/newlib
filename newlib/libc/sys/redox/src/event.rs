@@ -1,6 +1,5 @@
 use core::slice;
 use libc::{c_int, c_uint};
-use syscall;
 use syscall::error::{Error, EINVAL};
 use types::{fd_set, pollfd, timeval, FD_SETSIZE, POLLIN, POLLOUT, NFDBITS};
 

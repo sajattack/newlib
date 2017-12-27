@@ -168,7 +168,7 @@ libc_fn!(unsafe setregid(rgid: gid_t, egid: gid_t) -> Result<c_int> {
 });
 
 libc_fn!(unsafe setegid(egid: gid_t) -> Result<c_int> {
-    Ok(syscall::setregid(-1 as usize, egid as usize)? as c_int)
+    Ok(syscall::setregid(-1isize as usize, egid as usize)? as c_int)
 });
 
 libc_fn!(unsafe setgid(gid: gid_t) -> Result<c_int> {
@@ -180,7 +180,7 @@ libc_fn!(unsafe setreuid(ruid: uid_t, euid: uid_t) -> Result<c_int> {
 });
 
 libc_fn!(unsafe seteuid(euid: uid_t) -> Result<c_int> {
-    Ok(syscall::setreuid(-1 as usize, euid as usize)? as c_int)
+    Ok(syscall::setreuid(-1isize as usize, euid as usize)? as c_int)
 });
 
 libc_fn!(unsafe setuid(uid: uid_t) -> Result<c_int> {
