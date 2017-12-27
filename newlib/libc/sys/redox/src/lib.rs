@@ -91,9 +91,10 @@ pub extern "C" fn eh_personality() {}
 #[lang = "panic_fmt"]
 #[linkage = "weak"]
 #[no_mangle]
-pub extern fn rust_begin_panic(_msg: core::fmt::Arguments,
+pub extern "C" fn rust_begin_unwind(_msg: core::fmt::Arguments,
                                _file: &'static str,
-                               _line: u32) -> ! {
+                               _line: u32,
+                               _col: u32) -> ! {
     unsafe { intrinsics::abort() }
 }
 

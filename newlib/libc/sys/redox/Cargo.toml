@@ -7,7 +7,6 @@ name = "newlib_redox"
 crate-type = ["staticlib"]
 
 [profile.release]
-lto = true
 panic = "abort"
 
 [dependencies]
