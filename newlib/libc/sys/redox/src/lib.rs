@@ -174,12 +174,11 @@ pub extern "C" fn eh_personality() {}
 #[lang = "panic_fmt"]
 #[linkage = "weak"]
 #[no_mangle]
-pub extern "C" fn rust_begin_panic(
-    _msg: core::fmt::Arguments,
-    _file: &'static str,
-    _line: u32,
-) -> ! {
-    let mut s = String::new();
+pub extern "C" fn rust_begin_unwind(_msg: core::fmt::Arguments,
+                               _file: &'static str,
+                               _line: u32,
+                               _col: u32) -> ! {
+   let mut s = String::new();
     let _ = s.write_fmt(_msg);
     let _ = syscall::write(2, _file.as_bytes());
     let _ = syscall::write(2, "\n".as_bytes());
