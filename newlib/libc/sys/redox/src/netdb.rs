@@ -322,14 +322,12 @@ unsafe fn lookup_addr(addr: in_addr) -> Result<Vec<Vec<u8>>> {
      
                     if answer.a_type == 0x000C && answer.a_class == 0x0001 
                     {
-                        // replace weird ascii chars with periods
-                        let mut data = answer.data.clone();
-                        let end = data.len() -1;
-                        for (i,ch) in data.iter_mut().enumerate() {
-                            if *ch < 32 && i != 0 && i != end {
-                                *ch = 46;
-                            }
-                        }
+                        // answer.data is encoded kinda weird.
+                        // Basically length-prefixed strings for each 
+                        // subsection of the domain. 
+                        // We need to parse this to insert periods where
+                        // they belong (ie at the end of each string)
+                        let data = parse_data(answer.data.clone());
                         names.push(data);
                     }
                 }
@@ -340,6 +338,22 @@ unsafe fn lookup_addr(addr: in_addr) -> Result<Vec<Vec<u8>>> {
     } else {
         Err(Error::new(EINVAL))
     }
+}
+
+fn parse_data(mut data: Vec<u8>) -> Vec<u8> {
+    let mut cursor = 0;
+    let mut offset = 0;
+    let mut index = 0; 
+    let mut output = data.clone();
+    while index < data.len() - 1 {
+        offset = data[index] as usize;
+        index = cursor + offset + 1;
+        output[index] = '.' as u8;
+        cursor = index;
+    }
+    //we don't want an extra period at the end
+    output.pop(); 
+    return output 
 }
 
 
@@ -564,8 +578,7 @@ libc_fn!(unsafe getprotoent() -> *const protoent {
 
     PROTO_ENTRY = protoent { 
         p_name: proto_name.as_slice().as_ptr() as *const c_char,
-        //surprisingly C doesn't care that we're giving it a pointer to a Vec
-        p_aliases: proto_aliases.as_slice().as_ptr() as *const *const i8, 
+        p_aliases: proto_aliases.iter().map(|x| x.as_ptr() as *const i8).collect::<Vec<*const i8>>().as_ptr(),
         p_proto: PROTO_NUM.unwrap()           
     };
     PROTO_ALIASES = Some(proto_aliases);
@@ -648,8 +661,7 @@ libc_fn!(unsafe getservent() -> *const servent {
 
     SERV_ENTRY = servent { 
         s_name: serv_name.as_slice().as_ptr() as *const c_char,
-        //surprisingly C doesn't care that we're giving it a pointer to a Vec
-        s_aliases: serv_aliases.as_slice().as_ptr() as *const *const i8, 
+        s_aliases: serv_aliases.iter().map(|x| x.as_ptr() as *const i8).collect::<Vec<*const i8>>().as_ptr(),
         s_port: SERV_PORT.unwrap(),
         s_proto: proto.as_slice().as_ptr() as *const c_char            
     };
